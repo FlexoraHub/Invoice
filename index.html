@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RRS Printer Entry & Invoice</title>
+  <title>RRS FlexoraHub - Printer Billing & Invoice</title>
   <!-- Direct PDF Generation Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body {
-      background: #f0f4fa;
+      background: #e8effa;
       margin: 0;
-      padding: 20px;
+      padding: 30px 20px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
     }
-    .card {
+    .website-container {
       background: #ffffff;
       width: 100%;
-      max-width: 440px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(3, 64, 171, 0.12);
+      max-width: 840px;
+      border-radius: 18px;
+      box-shadow: 0 12px 35px rgba(3, 64, 171, 0.14);
       overflow: hidden;
     }
     .banner-img {
@@ -31,48 +31,63 @@
       display: block;
       object-fit: cover;
     }
-    .card-body {
-      padding: 20px 24px 24px;
+    .content-area {
+      padding: 32px 42px 40px;
     }
     h2 {
-      margin: 0 0 16px;
+      margin: 0 0 24px;
       color: rgb(3, 64, 171);
-      font-size: 20px;
+      font-size: 26px;
       text-align: center;
+      letter-spacing: 0.3px;
+      border-bottom: 2px solid #eef4ff;
+      padding-bottom: 14px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+    .full-width {
+      grid-column: 1 / -1;
     }
     label {
       display: block;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
-      color: #333;
-      margin-bottom: 6px;
-      margin-top: 13px;
+      color: #1e293b;
+      margin-bottom: 8px;
     }
     input[type="text"], input[type="number"], select {
       width: 100%;
-      padding: 11px 12px;
+      padding: 13px 15px;
       border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 15px;
+      border-radius: 10px;
+      font-size: 16px;
       outline: none;
       background: #ffffff;
+      transition: border-color 0.2s;
     }
-    input:focus, select:focus { border-color: rgb(3, 64, 171); }
+    input:focus, select:focus {
+      border-color: rgb(3, 64, 171);
+      box-shadow: 0 0 0 3px rgba(3, 64, 171, 0.1);
+    }
     .toggle-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
     .toggle-btn {
-      padding: 10px;
+      padding: 13px 12px;
       border: 1.5px solid #cbd5e1;
       background: #f8fafc;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
       cursor: pointer;
       color: #334155;
       text-align: center;
+      transition: all 0.2s;
     }
     .toggle-btn.active {
       background: rgb(3, 64, 171);
@@ -80,49 +95,53 @@
       border-color: rgb(3, 64, 171);
     }
     .spiral-grid {
+      grid-column: 1 / -1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 20px;
       background: #f8fafc;
-      padding: 10px 12px 12px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      margin-top: 10px;
-    }
-    .spiral-grid label {
-      margin-top: 0;
-      font-size: 12px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
     }
     .summary-box {
+      grid-column: 1 / -1;
       background: #eef4ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-top: 18px;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 18px 24px;
+      margin-top: 6px;
       display: flex;
-      justify-content: space-between;
-      font-size: 13px;
+      justify-content: space-around;
+      font-size: 15px;
       color: #1e3a8a;
     }
     .summary-box div { text-align: center; }
-    .summary-box strong { display: block; font-size: 17px; margin-top: 2px; }
+    .summary-box strong {
+      display: block;
+      font-size: 24px;
+      margin-top: 4px;
+      color: rgb(3, 64, 171);
+    }
     .save-btn {
-      width: 100%;
-      margin-top: 18px;
-      padding: 13px;
+      grid-column: 1 / -1;
+      margin-top: 8px;
+      padding: 16px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 12px;
+      font-size: 18px;
       font-weight: 700;
       cursor: pointer;
+      transition: background 0.2s;
     }
+    .save-btn:hover { background: #022d7a; }
     .save-btn:disabled { background: #94a3b8; cursor: not-allowed; }
     #status {
-      margin-top: 12px;
+      grid-column: 1 / -1;
       text-align: center;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
     }
 
@@ -133,29 +152,29 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px dashed #cbd5e1;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
+      padding-bottom: 14px;
+      margin-bottom: 20px;
     }
     .inv-title {
-      font-size: 18px;
+      font-size: 24px;
       font-weight: 800;
       color: rgb(3, 64, 171);
       letter-spacing: 0.5px;
     }
     .inv-meta {
-      font-size: 12px;
+      font-size: 15px;
       color: #64748b;
       text-align: right;
     }
     .inv-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 6px;
+      margin-top: 8px;
     }
     .inv-table td {
-      padding: 11px 6px;
+      padding: 14px 10px;
       border-bottom: 1px solid #e2e8f0;
-      font-size: 14px;
+      font-size: 16px;
     }
     .inv-table td:first-child {
       color: #475569;
@@ -168,144 +187,162 @@
     }
     .inv-total-row {
       background: #eef4ff;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 16px;
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-top: 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border: 1.5px solid #bfdbfe;
     }
     .inv-total-row span {
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 700;
       color: #1e3a8a;
     }
     .inv-total-row strong {
-      font-size: 22px;
+      font-size: 26px;
       color: rgb(3, 64, 171);
     }
     .inv-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 0 24px 24px;
+      gap: 16px;
+      padding: 0 42px 36px;
     }
     .btn-print {
-      padding: 12px;
+      padding: 15px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
-      border-radius: 10px;
-      font-size: 14px;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: 700;
       cursor: pointer;
     }
     .btn-new {
-      padding: 12px;
+      padding: 15px;
       background: #e2e8f0;
       color: #1e293b;
       border: none;
-      border-radius: 10px;
-      font-size: 14px;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: 700;
       cursor: pointer;
     }
     .inv-footer {
       text-align: center;
-      font-size: 12px;
+      font-size: 14px;
       color: #64748b;
-      margin-top: 16px;
+      margin-top: 22px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 640px) {
+      .form-grid, .spiral-grid { grid-template-columns: 1fr; }
+      .content-area { padding: 20px; }
+      .inv-actions { padding: 0 20px 24px; }
     }
   </style>
 </head>
 <body>
 
-<div class="card">
+<div class="website-container">
   <!-- PDF-la capture aagura area (Banner + Invoice Body) -->
   <div id="pdfContent" style="background: #ffffff;">
     <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
 
     <!-- FORM SECTION -->
-    <div class="card-body" id="formSection">
+    <div class="content-area" id="formSection">
       <h2>Printer Job Entry</h2>
 
-      <label>Name of the Customer</label>
-      <input type="text" id="customerName" placeholder="Enter Customer Name" />
-
-      <label>Name of the Job</label>
-      <input type="text" id="jobPurpose" placeholder="Enter Job Name" />
-
-      <label>Number of Pages</label>
-      <input type="number" id="numPages" min="1" placeholder="e.g. 10" oninput="calculate()" />
-
-      <label>Print Color</label>
-      <div class="toggle-group">
-        <button type="button" class="toggle-btn active" id="btnBW" onclick="setColor('bw')">Black & White</button>
-        <button type="button" class="toggle-btn" id="btnColor" onclick="setColor('color')">Color</button>
-      </div>
-
-      <label>Print Side</label>
-      <div class="toggle-group">
-        <button type="button" class="toggle-btn active" id="btnSingle" onclick="setSide('single')">Single Side</button>
-        <button type="button" class="toggle-btn" id="btnFrontBack" onclick="setSide('frontback')">Front & Back</button>
-      </div>
-
-      <label>Page Orientation</label>
-      <div class="toggle-group">
-        <button type="button" class="toggle-btn active" id="btnPortrait" onclick="setOrientation('portrait')">Portrait</button>
-        <button type="button" class="toggle-btn" id="btnLandscape" onclick="setOrientation('landscape')">Landscape</button>
-      </div>
-
-      <label>Binding / Spiral</label>
-      <div class="toggle-group">
-        <button type="button" class="toggle-btn active" id="btnWithoutSpiral" onclick="setSpiral('without')">Without Spiral</button>
-        <button type="button" class="toggle-btn" id="btnWithSpiral" onclick="setSpiral('with')">With Spiral</button>
-      </div>
-
-      <div id="spiralBox" class="spiral-grid" style="display:none;">
+      <div class="form-grid">
         <div>
-          <label>No. of Spirals</label>
-          <select id="spiralQty" onchange="calculate()"></select>
+          <label>Name of the Customer</label>
+          <input type="text" id="customerName" placeholder="Enter Customer Name" />
         </div>
+
         <div>
-          <label>Spiral Rate (₹)</label>
-          <input type="number" id="spiralRate" min="0" step="1" value="30" oninput="calculate()" />
+          <label>Name of the Job</label>
+          <input type="text" id="jobPurpose" placeholder="Enter Job Name" />
         </div>
-      </div>
 
-      <label>Amount Mode</label>
-      <div class="toggle-group">
-        <button type="button" class="toggle-btn active" id="btnAuto" onclick="setMode('auto')">Set Automatic Amount</button>
-        <button type="button" class="toggle-btn" id="btnManual" onclick="setMode('manual')">Set Manual Amount</button>
-      </div>
+        <div>
+          <label>Number of Pages</label>
+          <input type="number" id="numPages" min="1" placeholder="e.g. 10" oninput="calculate()" />
+        </div>
 
-      <div id="autoBox">
-        <label id="rateLabel">Rate Per Sheet (₹)</label>
-        <input type="number" id="autoRate" step="0.01" min="0" value="2" oninput="saveDefaultRate(); calculate();" />
-      </div>
+        <div>
+          <label>Print Color</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-btn active" id="btnBW" onclick="setColor('bw')">Black & White</button>
+            <button type="button" class="toggle-btn" id="btnColor" onclick="setColor('color')">Color</button>
+          </div>
+        </div>
 
-      <div id="manualBox" style="display:none;">
-        <label>Total Print Amount Collected (₹)</label>
-        <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
-      </div>
+        <div>
+          <label>Print Side</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-btn active" id="btnSingle" onclick="setSide('single')">Single Side</button>
+            <button type="button" class="toggle-btn" id="btnFrontBack" onclick="setSide('frontback')">Front & Back</button>
+          </div>
+        </div>
 
-      <div class="summary-box">
-        <div>Paper QTY<strong id="dispQty">0</strong></div>
-        <div>Amt / Page<strong id="dispRate">₹0</strong></div>
-        <div>Total Amount<strong id="dispTotal">₹0</strong></div>
-      </div>
+        <div>
+          <label>Binding / Spiral</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-btn active" id="btnWithoutSpiral" onclick="setSpiral('without')">Without Spiral</button>
+            <button type="button" class="toggle-btn" id="btnWithSpiral" onclick="setSpiral('with')">With Spiral</button>
+          </div>
+        </div>
 
-      <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save & Download Invoice</button>
-      <div id="status"></div>
+        <div id="spiralBox" class="spiral-grid" style="display:none;">
+          <div>
+            <label>No. of Spirals</label>
+            <select id="spiralQty" onchange="calculate()"></select>
+          </div>
+          <div>
+            <label>Spiral Rate (₹)</label>
+            <input type="number" id="spiralRate" min="0" step="1" value="30" oninput="calculate()" />
+          </div>
+        </div>
+
+        <div>
+          <label>Amount Mode</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-btn active" id="btnAuto" onclick="setMode('auto')">Set Automatic Amount</button>
+            <button type="button" class="toggle-btn" id="btnManual" onclick="setMode('manual')">Set Manual Amount</button>
+          </div>
+        </div>
+
+        <div id="autoBox">
+          <label id="rateLabel">Rate Per Sheet (₹)</label>
+          <input type="number" id="autoRate" step="0.01" min="0" value="2" oninput="saveDefaultRate(); calculate();" />
+        </div>
+
+        <div id="manualBox" style="display:none;">
+          <label>Total Print Amount Collected (₹)</label>
+          <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
+        </div>
+
+        <div class="summary-box">
+          <div>Paper QTY<strong id="dispQty">0</strong></div>
+          <div>Amt / Page<strong id="dispRate">₹0</strong></div>
+          <div>Print Amount<strong id="dispPrintAmt">₹0</strong></div>
+          <div>Grand Total<strong id="dispTotal">₹0</strong></div>
+        </div>
+
+        <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save & Download Invoice</button>
+        <div id="status"></div>
+      </div>
     </div>
 
     <!-- INVOICE SECTION -->
-    <div class="card-body" id="invoiceSection">
+    <div class="content-area" id="invoiceSection">
       <div class="inv-header">
         <div class="inv-title">INVOICE</div>
         <div class="inv-meta">
-          <div id="invNo" style="font-weight: 700; color: #0f172a;">[RRS-154]</div>
+          <div id="invNo" style="font-weight: 700; color: #0f172a; font-size: 16px;">[RRS-154]</div>
           <div id="invDate"></div>
         </div>
       </div>
@@ -330,10 +367,6 @@
         <tr>
           <td>Print Side</td>
           <td id="invSide">-</td>
-        </tr>
-        <tr>
-          <td>Orientation</td>
-          <td id="invOrientation">-</td>
         </tr>
         <tr id="invSpiralRow" style="display:none;">
           <td>Spiral Amount</td>
@@ -362,7 +395,6 @@
 
   let printColor = "bw";
   let printSide = "single";
-  let pageOrientation = "portrait";
   let spiralOption = "without";
   let amountMode = "auto";
   let currentPdfFilename = "Invoice.pdf";
@@ -416,12 +448,6 @@
     calculate();
   }
 
-  function setOrientation(orientation) {
-    pageOrientation = orientation;
-    document.getElementById("btnPortrait").classList.toggle("active", orientation === "portrait");
-    document.getElementById("btnLandscape").classList.toggle("active", orientation === "landscape");
-  }
-
   function setSpiral(option) {
     spiralOption = option;
     document.getElementById("btnWithoutSpiral").classList.toggle("active", option === "without");
@@ -470,6 +496,7 @@
 
     document.getElementById("dispQty").innerText = paperQty;
     document.getElementById("dispRate").innerText = "₹" + amtPerPage;
+    document.getElementById("dispPrintAmt").innerText = "₹" + printAmount;
     document.getElementById("dispTotal").innerText = "₹" + totalAmount;
 
     return { pages, paperQty, amtPerPage, printAmount, spiralQty, spiralRate, spiralAmount, totalAmount };
@@ -482,7 +509,7 @@
       filename:     currentPdfFilename,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(element).save();
   }
@@ -490,7 +517,7 @@
   async function saveJob() {
     const customerName = document.getElementById("customerName").value.trim();
     const rawJobName = document.getElementById("jobPurpose").value.trim();
-    const { pages, paperQty, amtPerPage, spiralQty, spiralRate, spiralAmount, totalAmount } = calculate();
+    const { pages, paperQty, amtPerPage, printAmount, spiralQty, spiralRate, spiralAmount, totalAmount } = calculate();
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("saveBtn");
 
@@ -504,22 +531,21 @@
       statusEl.innerText = "Job Name enter pannunga!";
       return;
     }
-    if (paperQty <= 0 || totalAmount <= 0) {
+    if (paperQty <= 0 || printAmount <= 0) {
       statusEl.style.color = "red";
-      statusEl.innerText = "Pages matrum Amount sariya kudunga!";
+      statusEl.innerText = "Pages matrum Print Amount sariya kudunga!";
       return;
     }
 
     const colorText = printColor === "bw" ? "Black & White" : "Color";
     const sideText = printSide === "single" ? "Single Side" : "Front & Back";
-    const orientationText = pageOrientation === "portrait" ? "Portrait" : "Landscape";
 
     btn.disabled = true;
     btn.innerText = "Saving & Downloading PDF...";
     statusEl.innerText = "";
 
     try {
-      // Sheet-la Name of the Job (rawJobName) mattum dhaan pogum
+      // Google Sheet-la Print Amount (printAmount) mattum dhaan update aagum (Spiral amount add aagadhu)
       await fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -528,7 +554,7 @@
           jobPurpose: rawJobName,
           paperQty: paperQty,
           amtPerPage: amtPerPage,
-          amount: totalAmount
+          amount: printAmount
         })
       });
 
@@ -546,9 +572,8 @@
       document.getElementById("invPages").innerText = pages + " Pages";
       document.getElementById("invColor").innerText = colorText;
       document.getElementById("invSide").innerText = sideText;
-      document.getElementById("invOrientation").innerText = orientationText;
 
-      // With Spiral kudutha mattum Spiral Amount row kaattum
+      // With Spiral kudutha mattum Spiral Amount row invoice-la kaattum
       if (spiralOption === "with") {
         document.getElementById("invSpiralRow").style.display = "table-row";
         document.getElementById("invSpiralAmt").innerText = spiralQty + " × ₹" + spiralRate + " = ₹" + spiralAmount;
@@ -581,7 +606,6 @@
     document.getElementById("jobPurpose").value = "";
     document.getElementById("numPages").value = "";
     document.getElementById("manualTotal").value = "";
-    setOrientation("portrait");
     setSpiral("without");
     document.getElementById("spiralQty").value = "1";
     document.getElementById("spiralRate").value = "30";
