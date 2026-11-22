@@ -6,8 +6,6 @@
   <title>RRS Printer Entry & Invoice</title>
   <!-- Direct PDF Generation Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <!-- Pure SVG QR Generator (html2canvas-la 100% capture aagum) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body {
@@ -50,15 +48,16 @@
       margin-bottom: 6px;
       margin-top: 13px;
     }
-    input[type="text"], input[type="number"] {
+    input[type="text"], input[type="number"], select {
       width: 100%;
       padding: 11px 12px;
       border: 1.5px solid #cbd5e1;
       border-radius: 8px;
       font-size: 15px;
       outline: none;
+      background: #ffffff;
     }
-    input:focus { border-color: rgb(3, 64, 171); }
+    input:focus, select:focus { border-color: rgb(3, 64, 171); }
     .toggle-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -79,6 +78,20 @@
       background: rgb(3, 64, 171);
       color: #fff;
       border-color: rgb(3, 64, 171);
+    }
+    .spiral-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: #f8fafc;
+      padding: 10px 12px 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      margin-top: 10px;
+    }
+    .spiral-grid label {
+      margin-top: 0;
+      font-size: 12px;
     }
     .summary-box {
       background: #eef4ff;
@@ -140,7 +153,7 @@
       margin-top: 6px;
     }
     .inv-table td {
-      padding: 10px 6px;
+      padding: 11px 6px;
       border-bottom: 1px solid #e2e8f0;
       font-size: 14px;
     }
@@ -156,8 +169,8 @@
     .inv-total-row {
       background: #eef4ff;
       border-radius: 10px;
-      padding: 12px 16px;
-      margin-top: 14px;
+      padding: 14px 16px;
+      margin-top: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -172,37 +185,6 @@
       font-size: 22px;
       color: rgb(3, 64, 171);
     }
-
-    /* QR Box Styling */
-    .qr-section {
-      margin-top: 16px;
-      padding: 12px;
-      border: 1.5px dashed #93c5fd;
-      border-radius: 12px;
-      background: #f8fafc;
-      text-align: center;
-    }
-    .qr-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: rgb(3, 64, 171);
-      margin-bottom: 8px;
-    }
-    .qr-wrapper {
-      display: inline-block;
-      padding: 8px;
-      background: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      line-height: 0;
-    }
-    .qr-sub {
-      font-size: 11px;
-      color: #475569;
-      margin-top: 6px;
-      font-weight: 600;
-    }
-
     .inv-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -233,13 +215,14 @@
       text-align: center;
       font-size: 12px;
       color: #64748b;
-      margin-top: 12px;
+      margin-top: 16px;
     }
   </style>
 </head>
 <body>
 
 <div class="card">
+  <!-- PDF-la capture aagura area (Banner + Invoice Body) -->
   <div id="pdfContent" style="background: #ffffff;">
     <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
 
@@ -268,6 +251,29 @@
         <button type="button" class="toggle-btn" id="btnFrontBack" onclick="setSide('frontback')">Front & Back</button>
       </div>
 
+      <label>Page Orientation</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn active" id="btnPortrait" onclick="setOrientation('portrait')">Portrait</button>
+        <button type="button" class="toggle-btn" id="btnLandscape" onclick="setOrientation('landscape')">Landscape</button>
+      </div>
+
+      <label>Binding / Spiral</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn active" id="btnWithoutSpiral" onclick="setSpiral('without')">Without Spiral</button>
+        <button type="button" class="toggle-btn" id="btnWithSpiral" onclick="setSpiral('with')">With Spiral</button>
+      </div>
+
+      <div id="spiralBox" class="spiral-grid" style="display:none;">
+        <div>
+          <label>No. of Spirals</label>
+          <select id="spiralQty" onchange="calculate()"></select>
+        </div>
+        <div>
+          <label>Spiral Rate (₹)</label>
+          <input type="number" id="spiralRate" min="0" step="1" value="30" oninput="calculate()" />
+        </div>
+      </div>
+
       <label>Amount Mode</label>
       <div class="toggle-group">
         <button type="button" class="toggle-btn active" id="btnAuto" onclick="setMode('auto')">Set Automatic Amount</button>
@@ -280,7 +286,7 @@
       </div>
 
       <div id="manualBox" style="display:none;">
-        <label>Total Amount Collected (₹)</label>
+        <label>Total Print Amount Collected (₹)</label>
         <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
       </div>
 
@@ -299,7 +305,7 @@
       <div class="inv-header">
         <div class="inv-title">INVOICE</div>
         <div class="inv-meta">
-          <div id="invNo" style="font-weight: 700; color: #0f172a;">[RRS-160]</div>
+          <div id="invNo" style="font-weight: 700; color: #0f172a;">[RRS-154]</div>
           <div id="invDate"></div>
         </div>
       </div>
@@ -325,18 +331,19 @@
           <td>Print Side</td>
           <td id="invSide">-</td>
         </tr>
+        <tr>
+          <td>Orientation</td>
+          <td id="invOrientation">-</td>
+        </tr>
+        <tr id="invSpiralRow" style="display:none;">
+          <td>Spiral Amount</td>
+          <td id="invSpiralAmt">-</td>
+        </tr>
       </table>
 
       <div class="inv-total-row">
         <span>Total Amount</span>
         <strong id="invTotal">₹0</strong>
-      </div>
-
-      <!-- Pure HTML Table Grid QR (PDF-la 100% render aagum) -->
-      <div class="qr-section">
-        <div class="qr-label">Scan & Pay via Any UPI App</div>
-        <div class="qr-wrapper" id="qrGridContainer"></div>
-        <div class="qr-sub" id="qrPayText">Pay ₹0 to RRS FlexoraHub</div>
       </div>
 
       <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
@@ -353,17 +360,25 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_Rqv5J_psAZw45CKIWQXBDWa-uancPp8gaoIVKTZbc9viMDcx90wB3HJYHeT4tvLsLQ/exec";
 
-  // ⚠️ INGA UNGA EXACT UPI ID-A MATTUM MAATHIKONGA (e.g. "9342451882@ybl" or "rohith@okicici")
-  const UPI_ID = "9342451882@fam";
-  const PAYEE_NAME = "RRS FlexoraHub";
-
   let printColor = "bw";
   let printSide = "single";
+  let pageOrientation = "portrait";
+  let spiralOption = "without";
   let amountMode = "auto";
   let currentPdfFilename = "Invoice.pdf";
 
+  // Populate Spiral Dropdown (1 to 50)
+  const spiralSelect = document.getElementById("spiralQty");
+  for (let i = 1; i <= 50; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.text = i + (i === 1 ? " Spiral" : " Spirals");
+    spiralSelect.appendChild(opt);
+  }
+
+  // Series Invoice Number Generator starting from [RRS-154]
   function getNextInvoiceNumber() {
-    let lastNum = parseInt(localStorage.getItem("rrs_custom_series") || "159", 10);
+    let lastNum = parseInt(localStorage.getItem("rrs_custom_series") || "153", 10);
     let nextNum = lastNum + 1;
     localStorage.setItem("rrs_custom_series", nextNum);
     return "RRS-" + String(nextNum).padStart(3, "0");
@@ -401,6 +416,20 @@
     calculate();
   }
 
+  function setOrientation(orientation) {
+    pageOrientation = orientation;
+    document.getElementById("btnPortrait").classList.toggle("active", orientation === "portrait");
+    document.getElementById("btnLandscape").classList.toggle("active", orientation === "landscape");
+  }
+
+  function setSpiral(option) {
+    spiralOption = option;
+    document.getElementById("btnWithoutSpiral").classList.toggle("active", option === "without");
+    document.getElementById("btnWithSpiral").classList.toggle("active", option === "with");
+    document.getElementById("spiralBox").style.display = option === "with" ? "grid" : "none";
+    calculate();
+  }
+
   function setMode(mode) {
     amountMode = mode;
     document.getElementById("btnAuto").classList.toggle("active", mode === "auto");
@@ -415,57 +444,45 @@
     const paperQty = printSide === "single" ? pages : Math.ceil(pages / 2);
 
     let amtPerPage = 0;
-    let totalAmount = 0;
+    let printAmount = 0;
 
     if (paperQty > 0) {
       if (amountMode === "auto") {
         amtPerPage = parseFloat(document.getElementById("autoRate").value) || 0;
-        totalAmount = +(paperQty * amtPerPage).toFixed(2);
+        printAmount = +(paperQty * amtPerPage).toFixed(2);
       } else {
-        totalAmount = parseFloat(document.getElementById("manualTotal").value) || 0;
-        amtPerPage = +(totalAmount / paperQty).toFixed(2);
+        printAmount = parseFloat(document.getElementById("manualTotal").value) || 0;
+        amtPerPage = +(printAmount / paperQty).toFixed(2);
       }
     }
+
+    let spiralQty = 0;
+    let spiralRate = 0;
+    let spiralAmount = 0;
+
+    if (spiralOption === "with") {
+      spiralQty = parseInt(document.getElementById("spiralQty").value) || 1;
+      spiralRate = parseFloat(document.getElementById("spiralRate").value) || 0;
+      spiralAmount = +(spiralQty * spiralRate).toFixed(2);
+    }
+
+    const totalAmount = +(printAmount + spiralAmount).toFixed(2);
 
     document.getElementById("dispQty").innerText = paperQty;
     document.getElementById("dispRate").innerText = "₹" + amtPerPage;
     document.getElementById("dispTotal").innerText = "₹" + totalAmount;
 
-    return { pages, paperQty, amtPerPage, totalAmount };
-  }
-
-  // Pure HTML Table QR Builder - No Canvas/DataURL issues in html2pdf!
-  function generateUpiQR(amount, invCode) {
-    const upiLink = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(invCode)}`;
-    const qr = qrcode(0, 'M');
-    qr.addData(upiLink);
-    qr.make();
-
-    const count = qr.getModuleCount();
-    const cellSize = Math.floor(125 / count);
-    let html = '<table style="border-collapse:collapse;border-spacing:0;margin:0 auto;">';
-    for (let r = 0; r < count; r++) {
-      html += '<tr>';
-      for (let c = 0; c < count; c++) {
-        const bg = qr.isDark(r, c) ? '#0340ab' : '#ffffff';
-        html += `<td style="width:${cellSize}px;height:${cellSize}px;background:${bg};padding:0;margin:0;"></td>`;
-      }
-      html += '</tr>';
-    }
-    html += '</table>';
-
-    document.getElementById("qrGridContainer").innerHTML = html;
-    document.getElementById("qrPayText").innerText = `Pay ₹${amount} to ${PAYEE_NAME}`;
+    return { pages, paperQty, amtPerPage, printAmount, spiralQty, spiralRate, spiralAmount, totalAmount };
   }
 
   function downloadPDF() {
     const element = document.getElementById("pdfContent");
     const opt = {
-      margin:       8,
+      margin:       10,
       filename:     currentPdfFilename,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(element).save();
   }
@@ -473,7 +490,7 @@
   async function saveJob() {
     const customerName = document.getElementById("customerName").value.trim();
     const rawJobName = document.getElementById("jobPurpose").value.trim();
-    const { pages, paperQty, amtPerPage, totalAmount } = calculate();
+    const { pages, paperQty, amtPerPage, spiralQty, spiralRate, spiralAmount, totalAmount } = calculate();
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("saveBtn");
 
@@ -495,12 +512,14 @@
 
     const colorText = printColor === "bw" ? "Black & White" : "Color";
     const sideText = printSide === "single" ? "Single Side" : "Front & Back";
+    const orientationText = pageOrientation === "portrait" ? "Portrait" : "Landscape";
 
     btn.disabled = true;
     btn.innerText = "Saving & Downloading PDF...";
     statusEl.innerText = "";
 
     try {
+      // Sheet-la Name of the Job (rawJobName) mattum dhaan pogum
       await fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -513,6 +532,7 @@
         })
       });
 
+      // Series Invoice Number & Date
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
       const invCode = getNextInvoiceNumber();
@@ -526,10 +546,19 @@
       document.getElementById("invPages").innerText = pages + " Pages";
       document.getElementById("invColor").innerText = colorText;
       document.getElementById("invSide").innerText = sideText;
+      document.getElementById("invOrientation").innerText = orientationText;
+
+      // With Spiral kudutha mattum Spiral Amount row kaattum
+      if (spiralOption === "with") {
+        document.getElementById("invSpiralRow").style.display = "table-row";
+        document.getElementById("invSpiralAmt").innerText = spiralQty + " × ₹" + spiralRate + " = ₹" + spiralAmount;
+      } else {
+        document.getElementById("invSpiralRow").style.display = "none";
+      }
+
       document.getElementById("invTotal").innerText = "₹" + totalAmount;
 
-      generateUpiQR(totalAmount, invCode);
-
+      // Switch to Invoice view & auto-download PDF
       document.getElementById("formSection").style.display = "none";
       document.getElementById("invoiceSection").style.display = "block";
       document.getElementById("invActions").style.display = "grid";
@@ -552,6 +581,10 @@
     document.getElementById("jobPurpose").value = "";
     document.getElementById("numPages").value = "";
     document.getElementById("manualTotal").value = "";
+    setOrientation("portrait");
+    setSpiral("without");
+    document.getElementById("spiralQty").value = "1";
+    document.getElementById("spiralRate").value = "30";
     calculate();
     document.getElementById("invoiceSection").style.display = "none";
     document.getElementById("invActions").style.display = "none";
