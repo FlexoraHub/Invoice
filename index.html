@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RRS Printer Entry</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body {
+      background: #f0f4fa;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 430px;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(3, 64, 171, 0.12);
+      border-top: 6px solid rgb(3, 64, 171);
+    }
+    h2 {
+      margin: 0 0 18px;
+      color: rgb(3, 64, 171);
+      font-size: 20px;
+      text-align: center;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+    }
+    input:focus { border-color: rgb(3, 64, 171); }
+    .toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .toggle-btn {
+      padding: 10px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      color: #334155;
+      text-align: center;
+    }
+    .toggle-btn.active {
+      background: rgb(3, 64, 171);
+      color: #fff;
+      border-color: rgb(3, 64, 171);
+    }
+    .summary-box {
+      background: #eef4ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #1e3a8a;
+    }
+    .summary-box div { text-align: center; }
+    .summary-box strong { display: block; font-size: 17px; margin-top: 2px; }
+    .save-btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 13px;
+      background: rgb(3, 64, 171);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .save-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    #status {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Printer Job Entry</h2>
+
+  <label>Name of the Job</label>
+  <input type="text" id="jobPurpose" placeholder="e.g. Photo Print, Front Page" />
+
+  <label>Number of Pages</label>
+  <input type="number" id="numPages" min="1" placeholder="e.g. 10" oninput="calculate()" />
+
+  <label>Print Side</label>
+  <div class="toggle-group">
+    <button type="button" class="toggle-btn active" id="btnSingle" onclick="setSide('single')">Single Side</button>
+    <button type="button" class="toggle-btn" id="btnFrontBack" onclick="setSide('frontback')">Front & Back</button>
+  </div>
+
+  <label>Amount Mode</label>
+  <div class="toggle-group">
+    <button type="button" class="toggle-btn active" id="btnAuto" onclick="setMode('auto')">Set Automatic Amount</button>
+    <button type="button" class="toggle-btn" id="btnManual" onclick="setMode('manual')">Set Manual Amount</button>
+  </div>
+
+  <div id="autoBox">
+    <label id="rateLabel">Rate Per Sheet (₹)</label>
+    <input type="number" id="autoRate" step="0.01" min="0" value="2" oninput="saveDefaultRate(); calculate();" />
+  </div>
+
+  <div id="manualBox" style="display:none;">
+    <label>Total Amount Collected (₹)</label>
+    <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
+  </div>
+
+  <div class="summary-box">
+    <div>Paper QTY<strong id="dispQty">0</strong></div>
+    <div>Amt / Page<strong id="dispRate">₹0</strong></div>
+    <div>Total Amount<strong id="dispTotal">₹0</strong></div>
+  </div>
+
+  <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save Job</button>
+  <div id="status"></div>
+</div>
+
+<script>
+  // உங்க Apps Script Web App URL-ஐ இங்கே பேஸ்ட் பண்ணுங்க
+  const SCRIPT_URL = "YOUR_WEB_APP_URL_HERE";
+
+  let printSide = "single";
+  let amountMode = "auto";
+
+  // Single Side & Front/Back ரேட்டை தனித்தனியா பிரவுசர்ல சேவ் பண்ணி வச்சுக்கும்
+  function getSavedRate(side) {
+    const key = side === "single" ? "rrs_rate_single" : "rrs_rate_fb";
+    const defaultVal = side === "single" ? 2 : 3;
+    return localStorage.getItem(key) || defaultVal;
+  }
+
+  function saveDefaultRate() {
+    const key = printSide === "single" ? "rrs_rate_single" : "rrs_rate_fb";
+    localStorage.setItem(key, document.getElementById("autoRate").value);
+  }
+
+  function setSide(side) {
+    printSide = side;
+    document.getElementById("btnSingle").classList.toggle("active", side === "single");
+    document.getElementById("btnFrontBack").classList.toggle("active", side === "frontback");
+    document.getElementById("autoRate").value = getSavedRate(side);
+    calculate();
+  }
+
+  function setMode(mode) {
+    amountMode = mode;
+    document.getElementById("btnAuto").classList.toggle("active", mode === "auto");
+    document.getElementById("btnManual").classList.toggle("active", mode === "manual");
+    document.getElementById("autoBox").style.display = mode === "auto" ? "block" : "none";
+    document.getElementById("manualBox").style.display = mode === "manual" ? "block" : "none";
+    calculate();
+  }
+
+  function calculate() {
+    const pages = parseInt(document.getElementById("numPages").value) || 0;
+    const paperQty = printSide === "single" ? pages : Math.ceil(pages / 2);
+
+    let amtPerPage = 0;
+    let totalAmount = 0;
+
+    if (paperQty > 0) {
+      if (amountMode === "auto") {
+        amtPerPage = parseFloat(document.getElementById("autoRate").value) || 0;
+        totalAmount = +(paperQty * amtPerPage).toFixed(2);
+      } else {
+        totalAmount = parseFloat(document.getElementById("manualTotal").value) || 0;
+        amtPerPage = +(totalAmount / paperQty).toFixed(2);
+      }
+    }
+
+    document.getElementById("dispQty").innerText = paperQty;
+    document.getElementById("dispRate").innerText = "₹" + amtPerPage;
+    document.getElementById("dispTotal").innerText = "₹" + totalAmount;
+
+    return { paperQty, amtPerPage, totalAmount };
+  }
+
+  async function saveJob() {
+    const jobPurpose = document.getElementById("jobPurpose").value.trim();
+    const { paperQty, amtPerPage, totalAmount } = calculate();
+    const statusEl = document.getElementById("status");
+    const btn = document.getElementById("saveBtn");
+
+    if (!jobPurpose) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Job Name என்டர் பண்ணுங்க!";
+      return;
+    }
+    if (paperQty <= 0 || totalAmount <= 0) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Pages மற்றும் Amount சரியா கொடுங்க!";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+    statusEl.innerText = "";
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobPurpose: jobPurpose,
+          paperQty: paperQty,
+          amtPerPage: amtPerPage,
+          amount: totalAmount
+        })
+      });
+
+      statusEl.style.color = "green";
+      statusEl.innerText = "Sheet-ல சேவ் ஆயிடுச்சு! (" + jobPurpose + " - ₹" + totalAmount + ")";
+      document.getElementById("jobPurpose").value = "";
+      document.getElementById("numPages").value = "";
+      document.getElementById("manualTotal").value = "";
+      calculate();
+    } catch (err) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Error: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Save Job";
+    }
+  }
+
+  // Initial load
+  document.getElementById("autoRate").value = getSavedRate("single");
+</script>
+
+</body>
+</html>
