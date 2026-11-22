@@ -429,19 +429,19 @@
 
     const colorText = printColor === "bw" ? "Black & White" : "Color";
     const sideText = printSide === "single" ? "Single Side" : "Front & Back";
-    const finalJobPurpose = rawJobName + " - " + customerName + " (" + colorText + ")";
 
     btn.disabled = true;
     btn.innerText = "Saving & Downloading PDF...";
     statusEl.innerText = "";
 
     try {
+      // Sheet-la Name of the Job (rawJobName) mattum dhaan pogum
       await fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
-          jobPurpose: finalJobPurpose,
+          jobPurpose: rawJobName,
           paperQty: paperQty,
           amtPerPage: amtPerPage,
           amount: totalAmount
@@ -452,8 +452,8 @@
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
       const invCode = getNextInvoiceNumber();
-      const safeCustomer = customerName.replace(/[^a-zA-Z0-9]/g, "_");
-      currentPdfFilename = invCode + "_" + safeCustomer + ".pdf";
+      const safeCustomer = customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
+      currentPdfFilename = safeCustomer + "_" + invCode + ".pdf";
 
       document.getElementById("invNo").innerText = "[" + invCode + "]";
       document.getElementById("invDate").innerText = dateStr;
