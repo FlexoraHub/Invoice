@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RRS Printer Entry & Invoice</title>
+  <!-- Direct PDF Generation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body {
@@ -172,7 +174,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-top: 18px;
+      padding: 0 24px 24px;
     }
     .btn-print {
       padding: 12px;
@@ -200,116 +202,112 @@
       color: #64748b;
       margin-top: 16px;
     }
-
-    /* Print Media Query - பிரிண்ட் எடுக்கும்போது பட்டன்கள் மறையும் */
-    @media print {
-      body { background: #fff; padding: 0; }
-      .card { box-shadow: none; max-width: 100%; border-radius: 0; }
-      .no-print { display: none !important; }
-    }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <!-- Banner Image -->
-  <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
+  <!-- PDF-la capture aagura area (Banner + Invoice Body) -->
+  <div id="pdfContent" style="background: #ffffff;">
+    <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
 
-  <!-- FORM SECTION -->
-  <div class="card-body" id="formSection">
-    <h2>Printer Job Entry</h2>
+    <!-- FORM SECTION -->
+    <div class="card-body" id="formSection">
+      <h2>Printer Job Entry</h2>
 
-    <label>Name of the Customer</label>
-    <input type="text" id="customerName" placeholder="Enter Customer Name" />
+      <label>Name of the Customer</label>
+      <input type="text" id="customerName" placeholder="Enter Customer Name" />
 
-    <label>Name of the Job</label>
-    <input type="text" id="jobPurpose" placeholder="Enter Job Name" />
+      <label>Name of the Job</label>
+      <input type="text" id="jobPurpose" placeholder="Enter Job Name" />
 
-    <label>Number of Pages</label>
-    <input type="number" id="numPages" min="1" placeholder="e.g. 10" oninput="calculate()" />
+      <label>Number of Pages</label>
+      <input type="number" id="numPages" min="1" placeholder="e.g. 10" oninput="calculate()" />
 
-    <label>Print Color</label>
-    <div class="toggle-group">
-      <button type="button" class="toggle-btn active" id="btnBW" onclick="setColor('bw')">Black & White</button>
-      <button type="button" class="toggle-btn" id="btnColor" onclick="setColor('color')">Color</button>
+      <label>Print Color</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn active" id="btnBW" onclick="setColor('bw')">Black & White</button>
+        <button type="button" class="toggle-btn" id="btnColor" onclick="setColor('color')">Color</button>
+      </div>
+
+      <label>Print Side</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn active" id="btnSingle" onclick="setSide('single')">Single Side</button>
+        <button type="button" class="toggle-btn" id="btnFrontBack" onclick="setSide('frontback')">Front & Back</button>
+      </div>
+
+      <label>Amount Mode</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn active" id="btnAuto" onclick="setMode('auto')">Set Automatic Amount</button>
+        <button type="button" class="toggle-btn" id="btnManual" onclick="setMode('manual')">Set Manual Amount</button>
+      </div>
+
+      <div id="autoBox">
+        <label id="rateLabel">Rate Per Sheet (₹)</label>
+        <input type="number" id="autoRate" step="0.01" min="0" value="2" oninput="saveDefaultRate(); calculate();" />
+      </div>
+
+      <div id="manualBox" style="display:none;">
+        <label>Total Amount Collected (₹)</label>
+        <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
+      </div>
+
+      <div class="summary-box">
+        <div>Paper QTY<strong id="dispQty">0</strong></div>
+        <div>Amt / Page<strong id="dispRate">₹0</strong></div>
+        <div>Total Amount<strong id="dispTotal">₹0</strong></div>
+      </div>
+
+      <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save & Download Invoice</button>
+      <div id="status"></div>
     </div>
 
-    <label>Print Side</label>
-    <div class="toggle-group">
-      <button type="button" class="toggle-btn active" id="btnSingle" onclick="setSide('single')">Single Side</button>
-      <button type="button" class="toggle-btn" id="btnFrontBack" onclick="setSide('frontback')">Front & Back</button>
-    </div>
+    <!-- INVOICE SECTION -->
+    <div class="card-body" id="invoiceSection">
+      <div class="inv-header">
+        <div class="inv-title">INVOICE</div>
+        <div class="inv-meta">
+          <div id="invNo" style="font-weight: 700; color: #0f172a;">[RRS-154]</div>
+          <div id="invDate"></div>
+        </div>
+      </div>
 
-    <label>Amount Mode</label>
-    <div class="toggle-group">
-      <button type="button" class="toggle-btn active" id="btnAuto" onclick="setMode('auto')">Set Automatic Amount</button>
-      <button type="button" class="toggle-btn" id="btnManual" onclick="setMode('manual')">Set Manual Amount</button>
-    </div>
+      <table class="inv-table">
+        <tr>
+          <td>Name of the Customer</td>
+          <td id="invCustomer">-</td>
+        </tr>
+        <tr>
+          <td>Name of the Job</td>
+          <td id="invJob">-</td>
+        </tr>
+        <tr>
+          <td>Number of Pages</td>
+          <td id="invPages">-</td>
+        </tr>
+        <tr>
+          <td>Print Color</td>
+          <td id="invColor">-</td>
+        </tr>
+        <tr>
+          <td>Print Side</td>
+          <td id="invSide">-</td>
+        </tr>
+      </table>
 
-    <div id="autoBox">
-      <label id="rateLabel">Rate Per Sheet (₹)</label>
-      <input type="number" id="autoRate" step="0.01" min="0" value="2" oninput="saveDefaultRate(); calculate();" />
-    </div>
+      <div class="inv-total-row">
+        <span>Total Amount</span>
+        <strong id="invTotal">₹0</strong>
+      </div>
 
-    <div id="manualBox" style="display:none;">
-      <label>Total Amount Collected (₹)</label>
-      <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
+      <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
     </div>
-
-    <div class="summary-box">
-      <div>Paper QTY<strong id="dispQty">0</strong></div>
-      <div>Amt / Page<strong id="dispRate">₹0</strong></div>
-      <div>Total Amount<strong id="dispTotal">₹0</strong></div>
-    </div>
-
-    <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save & Generate Invoice</button>
-    <div id="status"></div>
   </div>
 
-  <!-- INVOICE SECTION -->
-  <div class="card-body" id="invoiceSection">
-    <div class="inv-header">
-      <div class="inv-title">INVOICE</div>
-      <div class="inv-meta">
-        <div id="invNo">#INV-001</div>
-        <div id="invDate"></div>
-      </div>
-    </div>
-
-    <table class="inv-table">
-      <tr>
-        <td>Name of the Customer</td>
-        <td id="invCustomer">-</td>
-      </tr>
-      <tr>
-        <td>Name of the Job</td>
-        <td id="invJob">-</td>
-      </tr>
-      <tr>
-        <td>Number of Pages</td>
-        <td id="invPages">-</td>
-      </tr>
-      <tr>
-        <td>Print Color</td>
-        <td id="invColor">-</td>
-      </tr>
-      <tr>
-        <td>Print Side</td>
-        <td id="invSide">-</td>
-      </tr>
-    </table>
-
-    <div class="inv-total-row">
-      <span>Total Amount</span>
-      <strong id="invTotal">₹0</strong>
-    </div>
-
-    <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
-
-    <div class="inv-actions no-print">
-      <button type="button" class="btn-print" onclick="window.print()">Print / Save PDF</button>
-      <button type="button" class="btn-new" onclick="newEntry()">+ New Entry</button>
-    </div>
+  <!-- Action Buttons (PDF-la varaadhu) -->
+  <div class="inv-actions" id="invActions" style="display: none;">
+    <button type="button" class="btn-print" onclick="downloadPDF()">Download PDF Again</button>
+    <button type="button" class="btn-new" onclick="newEntry()">+ New Entry</button>
   </div>
 </div>
 
@@ -319,6 +317,15 @@
   let printColor = "bw";
   let printSide = "single";
   let amountMode = "auto";
+  let currentPdfFilename = "Invoice.pdf";
+
+  // Series Invoice Number Generator starting from [RRS-154]
+  function getNextInvoiceNumber() {
+    let lastNum = parseInt(localStorage.getItem("rrs_custom_series") || "153", 10);
+    let nextNum = lastNum + 1;
+    localStorage.setItem("rrs_custom_series", nextNum);
+    return "RRS-" + String(nextNum).padStart(3, "0");
+  }
 
   function getSavedRate(color, side) {
     const key = "rrs_rate_" + color + "_" + side;
@@ -385,6 +392,18 @@
     return { pages, paperQty, amtPerPage, totalAmount };
   }
 
+  function downloadPDF() {
+    const element = document.getElementById("pdfContent");
+    const opt = {
+      margin:       10,
+      filename:     currentPdfFilename,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  }
+
   async function saveJob() {
     const customerName = document.getElementById("customerName").value.trim();
     const rawJobName = document.getElementById("jobPurpose").value.trim();
@@ -413,7 +432,7 @@
     const finalJobPurpose = rawJobName + " - " + customerName + " (" + colorText + ")";
 
     btn.disabled = true;
-    btn.innerText = "Generating Invoice...";
+    btn.innerText = "Saving & Downloading PDF...";
     statusEl.innerText = "";
 
     try {
@@ -429,12 +448,14 @@
         })
       });
 
-      // Invoice டேட்டா ஃபில் பண்றோம்
+      // Series Invoice Number & Date
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-      const invNumber = "#INV-" + String(now.getHours()).padStart(2, "0") + String(now.getMinutes()).padStart(2, "0") + String(now.getSeconds()).padStart(2, "0");
+      const invCode = getNextInvoiceNumber();
+      const safeCustomer = customerName.replace(/[^a-zA-Z0-9]/g, "_");
+      currentPdfFilename = invCode + "_" + safeCustomer + ".pdf";
 
-      document.getElementById("invNo").innerText = invNumber;
+      document.getElementById("invNo").innerText = "[" + invCode + "]";
       document.getElementById("invDate").innerText = dateStr;
       document.getElementById("invCustomer").innerText = customerName;
       document.getElementById("invJob").innerText = rawJobName;
@@ -443,16 +464,21 @@
       document.getElementById("invSide").innerText = sideText;
       document.getElementById("invTotal").innerText = "₹" + totalAmount;
 
-      // Form-ஐ மறைச்சு Invoice-ஐ காட்டுறோம்
+      // Switch to Invoice view & auto-download PDF
       document.getElementById("formSection").style.display = "none";
       document.getElementById("invoiceSection").style.display = "block";
+      document.getElementById("invActions").style.display = "grid";
+
+      setTimeout(() => {
+        downloadPDF();
+      }, 300);
 
     } catch (err) {
       statusEl.style.color = "red";
       statusEl.innerText = "Error: " + err.message;
     } finally {
       btn.disabled = false;
-      btn.innerText = "Save & Generate Invoice";
+      btn.innerText = "Save & Download Invoice";
     }
   }
 
@@ -463,6 +489,7 @@
     document.getElementById("manualTotal").value = "";
     calculate();
     document.getElementById("invoiceSection").style.display = "none";
+    document.getElementById("invActions").style.display = "none";
     document.getElementById("formSection").style.display = "block";
   }
 
