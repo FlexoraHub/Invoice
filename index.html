@@ -6,8 +6,8 @@
   <title>RRS Printer Entry & Invoice</title>
   <!-- Direct PDF Generation Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <!-- Instant Base64 QR Library (PDF-la 100% varum) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <!-- Pure SVG QR Generator (html2canvas-la 100% capture aagum) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body {
@@ -194,11 +194,7 @@
       background: #ffffff;
       border-radius: 8px;
       border: 1px solid #e2e8f0;
-    }
-    #qrImage {
-      width: 125px;
-      height: 125px;
-      display: block;
+      line-height: 0;
     }
     .qr-sub {
       font-size: 11px;
@@ -244,7 +240,6 @@
 <body>
 
 <div class="card">
-  <!-- PDF-la capture aagura area -->
   <div id="pdfContent" style="background: #ffffff;">
     <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
 
@@ -304,7 +299,7 @@
       <div class="inv-header">
         <div class="inv-title">INVOICE</div>
         <div class="inv-meta">
-          <div id="invNo" style="font-weight: 700; color: #0f172a;">[RRS-154]</div>
+          <div id="invNo" style="font-weight: 700; color: #0f172a;">[RRS-160]</div>
           <div id="invDate"></div>
         </div>
       </div>
@@ -337,12 +332,10 @@
         <strong id="invTotal">₹0</strong>
       </div>
 
-      <!-- Dynamic UPI QR Code Section (Direct IMG tag for 100% PDF rendering) -->
+      <!-- Pure HTML Table Grid QR (PDF-la 100% render aagum) -->
       <div class="qr-section">
         <div class="qr-label">Scan & Pay via Any UPI App</div>
-        <div class="qr-wrapper">
-          <img id="qrImage" alt="UPI QR Code" />
-        </div>
+        <div class="qr-wrapper" id="qrGridContainer"></div>
         <div class="qr-sub" id="qrPayText">Pay ₹0 to RRS FlexoraHub</div>
       </div>
 
@@ -369,9 +362,8 @@
   let amountMode = "auto";
   let currentPdfFilename = "Invoice.pdf";
 
-  // Series Invoice Number Generator starting from [RRS-154]
   function getNextInvoiceNumber() {
-    let lastNum = parseInt(localStorage.getItem("rrs_custom_series") || "153", 10);
+    let lastNum = parseInt(localStorage.getItem("rrs_custom_series") || "159", 10);
     let nextNum = lastNum + 1;
     localStorage.setItem("rrs_custom_series", nextNum);
     return "RRS-" + String(nextNum).padStart(3, "0");
@@ -442,17 +434,27 @@
     return { pages, paperQty, amtPerPage, totalAmount };
   }
 
+  // Pure HTML Table QR Builder - No Canvas/DataURL issues in html2pdf!
   function generateUpiQR(amount, invCode) {
     const upiLink = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(invCode)}`;
-    const qr = new QRious({
-      value: upiLink,
-      size: 250,
-      foreground: '#0340ab',
-      background: '#ffffff',
-      level: 'M'
-    });
-    // Direct Base64 PNG set panrom — PDF capture-la 100% instant-aa theriyum
-    document.getElementById("qrImage").src = qr.toDataURL("image/png");
+    const qr = qrcode(0, 'M');
+    qr.addData(upiLink);
+    qr.make();
+
+    const count = qr.getModuleCount();
+    const cellSize = Math.floor(125 / count);
+    let html = '<table style="border-collapse:collapse;border-spacing:0;margin:0 auto;">';
+    for (let r = 0; r < count; r++) {
+      html += '<tr>';
+      for (let c = 0; c < count; c++) {
+        const bg = qr.isDark(r, c) ? '#0340ab' : '#ffffff';
+        html += `<td style="width:${cellSize}px;height:${cellSize}px;background:${bg};padding:0;margin:0;"></td>`;
+      }
+      html += '</tr>';
+    }
+    html += '</table>';
+
+    document.getElementById("qrGridContainer").innerHTML = html;
     document.getElementById("qrPayText").innerText = `Pay ₹${amount} to ${PAYEE_NAME}`;
   }
 
@@ -526,7 +528,6 @@
       document.getElementById("invSide").innerText = sideText;
       document.getElementById("invTotal").innerText = "₹" + totalAmount;
 
-      // Instant Base64 QR create panrom
       generateUpiQR(totalAmount, invCode);
 
       document.getElementById("formSection").style.display = "none";
