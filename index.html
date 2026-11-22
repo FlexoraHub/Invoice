@@ -8,45 +8,53 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body {
-      background: #e8effa;
+    html, body {
       margin: 0;
-      padding: 30px 20px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      padding: 0;
+      width: 100%;
       min-height: 100vh;
+      background: #ffffff;
     }
     .website-container {
       background: #ffffff;
       width: 100%;
-      max-width: 840px;
-      border-radius: 18px;
-      box-shadow: 0 12px 35px rgba(3, 64, 171, 0.14);
-      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .banner-wrapper {
+      width: 100%;
+      background: #ffffff;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      justify-content: center;
     }
     .banner-img {
       width: 100%;
-      height: auto;
+      max-height: 165px;
+      object-fit: contain;
       display: block;
-      object-fit: cover;
     }
     .content-area {
-      padding: 32px 42px 40px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 48px 28px;
+      flex: 1;
     }
     h2 {
-      margin: 0 0 24px;
+      margin: 0 0 18px;
       color: rgb(3, 64, 171);
-      font-size: 26px;
+      font-size: 24px;
       text-align: center;
       letter-spacing: 0.3px;
       border-bottom: 2px solid #eef4ff;
-      padding-bottom: 14px;
+      padding-bottom: 10px;
     }
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px 24px;
+      gap: 16px 32px;
     }
     .full-width {
       grid-column: 1 / -1;
@@ -56,14 +64,14 @@
       font-size: 14px;
       font-weight: 600;
       color: #1e293b;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     input[type="text"], input[type="number"], select {
       width: 100%;
-      padding: 13px 15px;
+      padding: 11px 14px;
       border: 1.5px solid #cbd5e1;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 15px;
       outline: none;
       background: #ffffff;
       transition: border-color 0.2s;
@@ -78,7 +86,7 @@
       gap: 10px;
     }
     .toggle-btn {
-      padding: 13px 12px;
+      padding: 11px 12px;
       border: 1.5px solid #cbd5e1;
       background: #f8fafc;
       border-radius: 10px;
@@ -98,9 +106,9 @@
       grid-column: 1 / -1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 32px;
       background: #f8fafc;
-      padding: 16px 20px;
+      padding: 14px 20px;
       border-radius: 12px;
       border: 1.5px solid #cbd5e1;
     }
@@ -109,8 +117,8 @@
       background: #eef4ff;
       border: 1.5px solid #bfdbfe;
       border-radius: 12px;
-      padding: 18px 24px;
-      margin-top: 6px;
+      padding: 14px 24px;
+      margin-top: 4px;
       display: flex;
       justify-content: space-around;
       font-size: 15px;
@@ -119,19 +127,19 @@
     .summary-box div { text-align: center; }
     .summary-box strong {
       display: block;
-      font-size: 24px;
-      margin-top: 4px;
+      font-size: 22px;
+      margin-top: 2px;
       color: rgb(3, 64, 171);
     }
     .save-btn {
       grid-column: 1 / -1;
-      margin-top: 8px;
-      padding: 16px;
+      margin-top: 4px;
+      padding: 14px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
       border-radius: 12px;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.2s;
@@ -146,14 +154,14 @@
     }
 
     /* Invoice Styles */
-    #invoiceSection { display: none; }
+    #invoiceSection { display: none; max-width: 780px; }
     .inv-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px dashed #cbd5e1;
       padding-bottom: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .inv-title {
       font-size: 24px;
@@ -172,7 +180,7 @@
       margin-top: 8px;
     }
     .inv-table td {
-      padding: 14px 10px;
+      padding: 13px 10px;
       border-bottom: 1px solid #e2e8f0;
       font-size: 16px;
     }
@@ -188,8 +196,8 @@
     .inv-total-row {
       background: #eef4ff;
       border-radius: 12px;
-      padding: 18px 22px;
-      margin-top: 22px;
+      padding: 16px 22px;
+      margin-top: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -208,10 +216,13 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-      padding: 0 42px 36px;
+      max-width: 780px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 48px 32px;
     }
     .btn-print {
-      padding: 15px;
+      padding: 14px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
@@ -221,7 +232,7 @@
       cursor: pointer;
     }
     .btn-new {
-      padding: 15px;
+      padding: 14px;
       background: #e2e8f0;
       color: #1e293b;
       border: none;
@@ -234,13 +245,13 @@
       text-align: center;
       font-size: 14px;
       color: #64748b;
-      margin-top: 22px;
+      margin-top: 20px;
     }
 
     /* Mobile Responsive */
     @media (max-width: 640px) {
-      .form-grid, .spiral-grid { grid-template-columns: 1fr; }
-      .content-area { padding: 20px; }
+      .form-grid, .spiral-grid { grid-template-columns: 1fr; gap: 14px; }
+      .content-area { padding: 16px 20px 24px; }
       .inv-actions { padding: 0 20px 24px; }
     }
   </style>
@@ -249,8 +260,10 @@
 
 <div class="website-container">
   <!-- PDF-la capture aagura area (Banner + Invoice Body) -->
-  <div id="pdfContent" style="background: #ffffff;">
-    <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
+  <div id="pdfContent" style="background: #ffffff; width: 100%;">
+    <div class="banner-wrapper">
+      <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
+    </div>
 
     <!-- FORM SECTION -->
     <div class="content-area" id="formSection">
@@ -545,7 +558,6 @@
     statusEl.innerText = "";
 
     try {
-      // Google Sheet-la Print Amount (printAmount) mattum dhaan update aagum (Spiral amount add aagadhu)
       await fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -558,7 +570,6 @@
         })
       });
 
-      // Series Invoice Number & Date
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
       const invCode = getNextInvoiceNumber();
@@ -573,7 +584,6 @@
       document.getElementById("invColor").innerText = colorText;
       document.getElementById("invSide").innerText = sideText;
 
-      // With Spiral kudutha mattum Spiral Amount row invoice-la kaattum
       if (spiralOption === "with") {
         document.getElementById("invSpiralRow").style.display = "table-row";
         document.getElementById("invSpiralAmt").innerText = spiralQty + " × ₹" + spiralRate + " = ₹" + spiralAmount;
@@ -583,7 +593,6 @@
 
       document.getElementById("invTotal").innerText = "₹" + totalAmount;
 
-      // Switch to Invoice view & auto-download PDF
       document.getElementById("formSection").style.display = "none";
       document.getElementById("invoiceSection").style.display = "block";
       document.getElementById("invActions").style.display = "grid";
