@@ -113,6 +113,12 @@
   <label>Number of Pages</label>
   <input type="number" id="numPages" min="1" placeholder="e.g. 10" oninput="calculate()" />
 
+  <label>Print Color</label>
+  <div class="toggle-group">
+    <button type="button" class="toggle-btn active" id="btnBW" onclick="setColor('bw')">Black & White</button>
+    <button type="button" class="toggle-btn" id="btnColor" onclick="setColor('color')">Color</button>
+  </div>
+
   <label>Print Side</label>
   <div class="toggle-group">
     <button type="button" class="toggle-btn active" id="btnSingle" onclick="setSide('single')">Single Side</button>
@@ -148,25 +154,39 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_Rqv5J_psAZw45CKIWQXBDWa-uancPp8gaoIVKTZbc9viMDcx90wB3HJYHeT4tvLsLQ/exec";
 
+  let printColor = "bw";
   let printSide = "single";
   let amountMode = "auto";
 
-  function getSavedRate(side) {
-    const key = side === "single" ? "rrs_rate_single" : "rrs_rate_fb";
-    const defaultVal = side === "single" ? 2 : 3;
-    return localStorage.getItem(key) || defaultVal;
+  function getSavedRate(color, side) {
+    const key = "rrs_rate_" + color + "_" + side;
+    const defaults = {
+      "bw_single": 2,
+      "bw_frontback": 3,
+      "color_single": 10,
+      "color_frontback": 15
+    };
+    return localStorage.getItem(key) || defaults[color + "_" + side];
   }
 
   function saveDefaultRate() {
-    const key = printSide === "single" ? "rrs_rate_single" : "rrs_rate_fb";
+    const key = "rrs_rate_" + printColor + "_" + printSide;
     localStorage.setItem(key, document.getElementById("autoRate").value);
+  }
+
+  function setColor(color) {
+    printColor = color;
+    document.getElementById("btnBW").classList.toggle("active", color === "bw");
+    document.getElementById("btnColor").classList.toggle("active", color === "color");
+    document.getElementById("autoRate").value = getSavedRate(printColor, printSide);
+    calculate();
   }
 
   function setSide(side) {
     printSide = side;
     document.getElementById("btnSingle").classList.toggle("active", side === "single");
     document.getElementById("btnFrontBack").classList.toggle("active", side === "frontback");
-    document.getElementById("autoRate").value = getSavedRate(side);
+    document.getElementById("autoRate").value = getSavedRate(printColor, printSide);
     calculate();
   }
 
@@ -204,12 +224,12 @@
   }
 
   async function saveJob() {
-    const jobPurpose = document.getElementById("jobPurpose").value.trim();
+    const rawJobName = document.getElementById("jobPurpose").value.trim();
     const { paperQty, amtPerPage, totalAmount } = calculate();
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("saveBtn");
 
-    if (!jobPurpose) {
+    if (!rawJobName) {
       statusEl.style.color = "red";
       statusEl.innerText = "Job Name enter pannunga!";
       return;
@@ -219,6 +239,9 @@
       statusEl.innerText = "Pages matrum Amount sariya kudunga!";
       return;
     }
+
+    const colorTag = printColor === "bw" ? "Black & White" : "Color";
+    const finalJobPurpose = rawJobName + " (" + colorTag + ")";
 
     btn.disabled = true;
     btn.innerText = "Saving...";
@@ -230,7 +253,7 @@
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
-          jobPurpose: jobPurpose,
+          jobPurpose: finalJobPurpose,
           paperQty: paperQty,
           amtPerPage: amtPerPage,
           amount: totalAmount
@@ -238,7 +261,7 @@
       });
 
       statusEl.style.color = "green";
-      statusEl.innerText = "Sheet-la save aayiduchu! (" + jobPurpose + " - ₹" + totalAmount + ")";
+      statusEl.innerText = "Sheet-la save aayiduchu! (" + finalJobPurpose + " - ₹" + totalAmount + ")";
       document.getElementById("jobPurpose").value = "";
       document.getElementById("numPages").value = "";
       document.getElementById("manualTotal").value = "";
@@ -253,7 +276,7 @@
   }
 
   // Initial load
-  document.getElementById("autoRate").value = getSavedRate("single");
+  document.getElementById("autoRate").value = getSavedRate("bw", "single");
 </script>
 
 </body>
