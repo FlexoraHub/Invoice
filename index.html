@@ -6,6 +6,8 @@
   <title>RRS Printer Entry & Invoice</title>
   <!-- Direct PDF Generation Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Dynamic UPI QR Code Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body {
@@ -138,7 +140,7 @@
       margin-top: 6px;
     }
     .inv-table td {
-      padding: 11px 6px;
+      padding: 10px 6px;
       border-bottom: 1px solid #e2e8f0;
       font-size: 14px;
     }
@@ -154,8 +156,8 @@
     .inv-total-row {
       background: #eef4ff;
       border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 16px;
+      padding: 12px 16px;
+      margin-top: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -170,6 +172,40 @@
       font-size: 22px;
       color: rgb(3, 64, 171);
     }
+
+    /* QR Box Styling */
+    .qr-section {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1.5px dashed #93c5fd;
+      border-radius: 12px;
+      background: #f8fafc;
+      text-align: center;
+    }
+    .qr-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgb(3, 64, 171);
+      margin-bottom: 8px;
+    }
+    #qrcode {
+      display: inline-block;
+      padding: 8px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    #qrcode img {
+      display: block;
+      margin: 0 auto;
+    }
+    .qr-sub {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
     .inv-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -200,14 +236,14 @@
       text-align: center;
       font-size: 12px;
       color: #64748b;
-      margin-top: 16px;
+      margin-top: 12px;
     }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <!-- PDF-la capture aagura area (Banner + Invoice Body) -->
+  <!-- PDF-la capture aagura area -->
   <div id="pdfContent" style="background: #ffffff;">
     <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
 
@@ -300,6 +336,13 @@
         <strong id="invTotal">₹0</strong>
       </div>
 
+      <!-- Dynamic UPI QR Code Section -->
+      <div class="qr-section">
+        <div class="qr-label">Scan & Pay via Any UPI App</div>
+        <div id="qrcode"></div>
+        <div class="qr-sub" id="qrPayText">Pay ₹0 to RRS FlexoraHub</div>
+      </div>
+
       <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
     </div>
   </div>
@@ -313,6 +356,10 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_Rqv5J_psAZw45CKIWQXBDWa-uancPp8gaoIVKTZbc9viMDcx90wB3HJYHeT4tvLsLQ/exec";
+
+  // ⚠️ INGA UNGA EXACT UPI ID-A MATTUM MAATHIKONGA (e.g. "9342451882@ybl" or "rohith@okicici")
+  const UPI_ID = "9342451882@fam";
+  const PAYEE_NAME = "RRS FlexoraHub";
 
   let printColor = "bw";
   let printSide = "single";
@@ -392,14 +439,29 @@
     return { pages, paperQty, amtPerPage, totalAmount };
   }
 
+  function generateUpiQR(amount, invCode) {
+    const qrContainer = document.getElementById("qrcode");
+    qrContainer.innerHTML = "";
+    const upiLink = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(invCode)}`;
+    new QRCode(qrContainer, {
+      text: upiLink,
+      width: 125,
+      height: 125,
+      colorDark: "#0340ab",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    document.getElementById("qrPayText").innerText = `Pay ₹${amount} to ${PAYEE_NAME}`;
+  }
+
   function downloadPDF() {
     const element = document.getElementById("pdfContent");
     const opt = {
-      margin:       10,
+      margin:       8,
       filename:     currentPdfFilename,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(element).save();
   }
@@ -435,7 +497,6 @@
     statusEl.innerText = "";
 
     try {
-      // Sheet-la Name of the Job (rawJobName) mattum dhaan pogum
       await fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -448,7 +509,6 @@
         })
       });
 
-      // Series Invoice Number & Date
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
       const invCode = getNextInvoiceNumber();
@@ -464,14 +524,16 @@
       document.getElementById("invSide").innerText = sideText;
       document.getElementById("invTotal").innerText = "₹" + totalAmount;
 
-      // Switch to Invoice view & auto-download PDF
+      // Exact bill amount-ku dynamic QR code create panrom
+      generateUpiQR(totalAmount, invCode);
+
       document.getElementById("formSection").style.display = "none";
       document.getElementById("invoiceSection").style.display = "block";
       document.getElementById("invActions").style.display = "grid";
 
       setTimeout(() => {
         downloadPDF();
-      }, 300);
+      }, 400);
 
     } catch (err) {
       statusEl.style.color = "red";
