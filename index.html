@@ -146,13 +146,11 @@
 </div>
 
 <script>
-  // உங்க Apps Script Web App URL-ஐ இங்கே பேஸ்ட் பண்ணுங்க
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_Rqv5J_psAZw45CKIWQXBDWa-uancPp8gaoIVKTZbc9viMDcx90wB3HJYHeT4tvLsLQ/exec";
 
   let printSide = "single";
   let amountMode = "auto";
 
-  // Single Side & Front/Back ரேட்டை தனித்தனியா பிரவுசர்ல சேவ் பண்ணி வச்சுக்கும்
   function getSavedRate(side) {
     const key = side === "single" ? "rrs_rate_single" : "rrs_rate_fb";
     const defaultVal = side === "single" ? 2 : 3;
@@ -213,12 +211,12 @@
 
     if (!jobPurpose) {
       statusEl.style.color = "red";
-      statusEl.innerText = "Job Name என்டர் பண்ணுங்க!";
+      statusEl.innerText = "Job Name enter pannunga!";
       return;
     }
     if (paperQty <= 0 || totalAmount <= 0) {
       statusEl.style.color = "red";
-      statusEl.innerText = "Pages மற்றும் Amount சரியா கொடுங்க!";
+      statusEl.innerText = "Pages matrum Amount sariya kudunga!";
       return;
     }
 
@@ -230,7 +228,7 @@
       await fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           jobPurpose: jobPurpose,
           paperQty: paperQty,
@@ -240,7 +238,7 @@
       });
 
       statusEl.style.color = "green";
-      statusEl.innerText = "Sheet-ல சேவ் ஆயிடுச்சு! (" + jobPurpose + " - ₹" + totalAmount + ")";
+      statusEl.innerText = "Sheet-la save aayiduchu! (" + jobPurpose + " - ₹" + totalAmount + ")";
       document.getElementById("jobPurpose").value = "";
       document.getElementById("numPages").value = "";
       document.getElementById("manualTotal").value = "";
