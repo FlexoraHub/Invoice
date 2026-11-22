@@ -6,8 +6,8 @@
   <title>RRS Printer Entry & Invoice</title>
   <!-- Direct PDF Generation Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <!-- Dynamic UPI QR Code Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Instant Base64 QR Library (PDF-la 100% varum) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body {
@@ -188,16 +188,17 @@
       color: rgb(3, 64, 171);
       margin-bottom: 8px;
     }
-    #qrcode {
+    .qr-wrapper {
       display: inline-block;
       padding: 8px;
       background: #ffffff;
       border-radius: 8px;
       border: 1px solid #e2e8f0;
     }
-    #qrcode img {
+    #qrImage {
+      width: 125px;
+      height: 125px;
       display: block;
-      margin: 0 auto;
     }
     .qr-sub {
       font-size: 11px;
@@ -336,10 +337,12 @@
         <strong id="invTotal">₹0</strong>
       </div>
 
-      <!-- Dynamic UPI QR Code Section -->
+      <!-- Dynamic UPI QR Code Section (Direct IMG tag for 100% PDF rendering) -->
       <div class="qr-section">
         <div class="qr-label">Scan & Pay via Any UPI App</div>
-        <div id="qrcode"></div>
+        <div class="qr-wrapper">
+          <img id="qrImage" alt="UPI QR Code" />
+        </div>
         <div class="qr-sub" id="qrPayText">Pay ₹0 to RRS FlexoraHub</div>
       </div>
 
@@ -440,17 +443,16 @@
   }
 
   function generateUpiQR(amount, invCode) {
-    const qrContainer = document.getElementById("qrcode");
-    qrContainer.innerHTML = "";
     const upiLink = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(invCode)}`;
-    new QRCode(qrContainer, {
-      text: upiLink,
-      width: 125,
-      height: 125,
-      colorDark: "#0340ab",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.M
+    const qr = new QRious({
+      value: upiLink,
+      size: 250,
+      foreground: '#0340ab',
+      background: '#ffffff',
+      level: 'M'
     });
+    // Direct Base64 PNG set panrom — PDF capture-la 100% instant-aa theriyum
+    document.getElementById("qrImage").src = qr.toDataURL("image/png");
     document.getElementById("qrPayText").innerText = `Pay ₹${amount} to ${PAYEE_NAME}`;
   }
 
@@ -524,7 +526,7 @@
       document.getElementById("invSide").innerText = sideText;
       document.getElementById("invTotal").innerText = "₹" + totalAmount;
 
-      // Exact bill amount-ku dynamic QR code create panrom
+      // Instant Base64 QR create panrom
       generateUpiQR(totalAmount, invCode);
 
       document.getElementById("formSection").style.display = "none";
@@ -533,7 +535,7 @@
 
       setTimeout(() => {
         downloadPDF();
-      }, 400);
+      }, 300);
 
     } catch (err) {
       statusEl.style.color = "red";
