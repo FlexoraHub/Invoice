@@ -127,12 +127,12 @@
 
   <div id="autoBox">
     <label id="rateLabel">Rate Per Sheet (₹)</label>
-    <input type="number" id="autoRate" step="0.01" min="0" value="2" oninput="saveDefaultRate(); calculate();" />
+    <input type="number" id="autoRate" step="0.01" min="0" value="0" oninput="saveDefaultRate(); calculate();" />
   </div>
 
   <div id="manualBox" style="display:none;">
     <label>Total Amount Collected (₹)</label>
-    <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
+    <input type="number" id="manualTotal" step="0.01" min="0" placeholder="Enter Price " oninput="calculate()" />
   </div>
 
   <div class="summary-box">
