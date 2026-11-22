@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RRS Printer Entry</title>
+  <title>RRS Printer Entry & Invoice</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body {
@@ -18,7 +18,7 @@
     .card {
       background: #ffffff;
       width: 100%;
-      max-width: 430px;
+      max-width: 440px;
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(3, 64, 171, 0.12);
       overflow: hidden;
@@ -33,7 +33,7 @@
       padding: 20px 24px 24px;
     }
     h2 {
-      margin: 0 0 18px;
+      margin: 0 0 16px;
       color: rgb(3, 64, 171);
       font-size: 20px;
       text-align: center;
@@ -44,7 +44,7 @@
       font-weight: 600;
       color: #333;
       margin-bottom: 6px;
-      margin-top: 14px;
+      margin-top: 13px;
     }
     input[type="text"], input[type="number"] {
       width: 100%;
@@ -108,6 +108,105 @@
       font-size: 13px;
       font-weight: 600;
     }
+
+    /* Invoice Styles */
+    #invoiceSection { display: none; }
+    .inv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #cbd5e1;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .inv-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: rgb(3, 64, 171);
+      letter-spacing: 0.5px;
+    }
+    .inv-meta {
+      font-size: 12px;
+      color: #64748b;
+      text-align: right;
+    }
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+    }
+    .inv-table td {
+      padding: 11px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+    .inv-table td:first-child {
+      color: #475569;
+      font-weight: 600;
+    }
+    .inv-table td:last-child {
+      text-align: right;
+      color: #0f172a;
+      font-weight: 700;
+    }
+    .inv-total-row {
+      background: #eef4ff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1.5px solid #bfdbfe;
+    }
+    .inv-total-row span {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+    .inv-total-row strong {
+      font-size: 22px;
+      color: rgb(3, 64, 171);
+    }
+    .inv-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .btn-print {
+      padding: 12px;
+      background: rgb(3, 64, 171);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-new {
+      padding: 12px;
+      background: #e2e8f0;
+      color: #1e293b;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .inv-footer {
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 16px;
+    }
+
+    /* Print Media Query - பிரிண்ட் எடுக்கும்போது பட்டன்கள் மறையும் */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .card { box-shadow: none; max-width: 100%; border-radius: 0; }
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -116,8 +215,12 @@
   <!-- Banner Image -->
   <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
 
-  <div class="card-body">
+  <!-- FORM SECTION -->
+  <div class="card-body" id="formSection">
     <h2>Printer Job Entry</h2>
+
+    <label>Name of the Customer</label>
+    <input type="text" id="customerName" placeholder="Enter Customer Name" />
 
     <label>Name of the Job</label>
     <input type="text" id="jobPurpose" placeholder="Enter Job Name" />
@@ -159,8 +262,54 @@
       <div>Total Amount<strong id="dispTotal">₹0</strong></div>
     </div>
 
-    <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save Job</button>
+    <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save & Generate Invoice</button>
     <div id="status"></div>
+  </div>
+
+  <!-- INVOICE SECTION -->
+  <div class="card-body" id="invoiceSection">
+    <div class="inv-header">
+      <div class="inv-title">INVOICE</div>
+      <div class="inv-meta">
+        <div id="invNo">#INV-001</div>
+        <div id="invDate"></div>
+      </div>
+    </div>
+
+    <table class="inv-table">
+      <tr>
+        <td>Name of the Customer</td>
+        <td id="invCustomer">-</td>
+      </tr>
+      <tr>
+        <td>Name of the Job</td>
+        <td id="invJob">-</td>
+      </tr>
+      <tr>
+        <td>Number of Pages</td>
+        <td id="invPages">-</td>
+      </tr>
+      <tr>
+        <td>Print Color</td>
+        <td id="invColor">-</td>
+      </tr>
+      <tr>
+        <td>Print Side</td>
+        <td id="invSide">-</td>
+      </tr>
+    </table>
+
+    <div class="inv-total-row">
+      <span>Total Amount</span>
+      <strong id="invTotal">₹0</strong>
+    </div>
+
+    <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
+
+    <div class="inv-actions no-print">
+      <button type="button" class="btn-print" onclick="window.print()">Print / Save PDF</button>
+      <button type="button" class="btn-new" onclick="newEntry()">+ New Entry</button>
+    </div>
   </div>
 </div>
 
@@ -233,15 +382,21 @@
     document.getElementById("dispRate").innerText = "₹" + amtPerPage;
     document.getElementById("dispTotal").innerText = "₹" + totalAmount;
 
-    return { paperQty, amtPerPage, totalAmount };
+    return { pages, paperQty, amtPerPage, totalAmount };
   }
 
   async function saveJob() {
+    const customerName = document.getElementById("customerName").value.trim();
     const rawJobName = document.getElementById("jobPurpose").value.trim();
-    const { paperQty, amtPerPage, totalAmount } = calculate();
+    const { pages, paperQty, amtPerPage, totalAmount } = calculate();
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("saveBtn");
 
+    if (!customerName) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Customer Name enter pannunga!";
+      return;
+    }
     if (!rawJobName) {
       statusEl.style.color = "red";
       statusEl.innerText = "Job Name enter pannunga!";
@@ -253,11 +408,12 @@
       return;
     }
 
-    const colorTag = printColor === "bw" ? "Black & White" : "Color";
-    const finalJobPurpose = rawJobName + " (" + colorTag + ")";
+    const colorText = printColor === "bw" ? "Black & White" : "Color";
+    const sideText = printSide === "single" ? "Single Side" : "Front & Back";
+    const finalJobPurpose = rawJobName + " - " + customerName + " (" + colorText + ")";
 
     btn.disabled = true;
-    btn.innerText = "Saving...";
+    btn.innerText = "Generating Invoice...";
     statusEl.innerText = "";
 
     try {
@@ -273,19 +429,41 @@
         })
       });
 
-      statusEl.style.color = "green";
-      statusEl.innerText = "Sheet-la save aayiduchu! (" + finalJobPurpose + " - ₹" + totalAmount + ")";
-      document.getElementById("jobPurpose").value = "";
-      document.getElementById("numPages").value = "";
-      document.getElementById("manualTotal").value = "";
-      calculate();
+      // Invoice டேட்டா ஃபில் பண்றோம்
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+      const invNumber = "#INV-" + String(now.getHours()).padStart(2, "0") + String(now.getMinutes()).padStart(2, "0") + String(now.getSeconds()).padStart(2, "0");
+
+      document.getElementById("invNo").innerText = invNumber;
+      document.getElementById("invDate").innerText = dateStr;
+      document.getElementById("invCustomer").innerText = customerName;
+      document.getElementById("invJob").innerText = rawJobName;
+      document.getElementById("invPages").innerText = pages + " Pages";
+      document.getElementById("invColor").innerText = colorText;
+      document.getElementById("invSide").innerText = sideText;
+      document.getElementById("invTotal").innerText = "₹" + totalAmount;
+
+      // Form-ஐ மறைச்சு Invoice-ஐ காட்டுறோம்
+      document.getElementById("formSection").style.display = "none";
+      document.getElementById("invoiceSection").style.display = "block";
+
     } catch (err) {
       statusEl.style.color = "red";
       statusEl.innerText = "Error: " + err.message;
     } finally {
       btn.disabled = false;
-      btn.innerText = "Save Job";
+      btn.innerText = "Save & Generate Invoice";
     }
+  }
+
+  function newEntry() {
+    document.getElementById("customerName").value = "";
+    document.getElementById("jobPurpose").value = "";
+    document.getElementById("numPages").value = "";
+    document.getElementById("manualTotal").value = "";
+    calculate();
+    document.getElementById("invoiceSection").style.display = "none";
+    document.getElementById("formSection").style.display = "block";
   }
 
   // Initial load
