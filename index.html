@@ -10,58 +10,44 @@
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     html, body {
       margin: 0;
-      padding: 12px;
+      padding: 14px;
       width: 100%;
       min-height: 100vh;
-      background: #f4f7fc;
+      background: #ffffff;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
     }
 
-    /* Landscape (Default Desktop/Laptop) Border Outline */
+    /* Second Image-la irukkura maari clean scaling + normal subtle outline */
     .website-container {
       background: #ffffff;
       width: 100%;
-      flex: 1;
+      max-width: 1120px;
+      min-height: calc(100vh - 28px);
       display: flex;
       flex-direction: column;
-      border: 2.5px solid rgb(3, 64, 171);
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(3, 64, 171, 0.08);
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
       overflow: hidden;
-    }
-
-    /* Portrait View Border Outline */
-    @media (orientation: portrait) {
-      html, body {
-        padding: 10px;
-      }
-      .website-container {
-        border: 2px solid rgb(3, 64, 171);
-        border-radius: 14px;
-        box-shadow: 0 4px 16px rgba(3, 64, 171, 0.1);
-      }
     }
 
     .banner-wrapper {
       width: 100%;
       background: #ffffff;
-      border-bottom: 2px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
       display: flex;
       justify-content: center;
       padding: 6px 12px;
     }
     .banner-img {
       width: 100%;
-      max-height: 150px;
+      max-height: 145px;
       object-fit: contain;
       display: block;
     }
     .content-area {
       width: 100%;
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 18px 40px 24px;
+      padding: 18px 28px 24px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -69,31 +55,31 @@
     h2 {
       margin: 0 0 18px;
       color: rgb(3, 64, 171);
-      font-size: 24px;
+      font-size: 22px;
       text-align: center;
       letter-spacing: 0.3px;
-      border-bottom: 2px solid #eef4ff;
+      border-bottom: 1.5px solid #eef4ff;
       padding-bottom: 10px;
     }
 
-    /* 3 Columns per Row */
+    /* 3 Columns per Row - Second Image exact proportion */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 18px 26px;
+      gap: 18px 24px;
     }
     label {
       display: block;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
       color: #1e293b;
-      margin-bottom: 7px;
+      margin-bottom: 6px;
     }
     input[type="text"], input[type="number"], select {
       width: 100%;
-      padding: 12px 14px;
+      padding: 11px 13px;
       border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 15px;
       outline: none;
       background: #ffffff;
@@ -101,7 +87,6 @@
     }
     input:focus, select:focus {
       border-color: rgb(3, 64, 171);
-      box-shadow: 0 0 0 3px rgba(3, 64, 171, 0.1);
     }
     .toggle-group {
       display: grid;
@@ -109,10 +94,10 @@
       gap: 8px;
     }
     .toggle-btn {
-      padding: 12px 10px;
+      padding: 11px 10px;
       border: 1.5px solid #cbd5e1;
       background: #f8fafc;
-      border-radius: 10px;
+      border-radius: 8px;
       font-weight: 600;
       font-size: 13.5px;
       cursor: pointer;
@@ -126,7 +111,6 @@
       border-color: rgb(3, 64, 171);
     }
 
-    /* Spiral inline pair inside 3rd column */
     .spiral-inline {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -140,23 +124,23 @@
       display: flex;
       justify-content: space-between;
       align-items: stretch;
-      gap: 24px;
+      gap: 20px;
     }
     .summary-box {
       background: #eef4ff;
-      border: 1.5px solid #bfdbfe;
-      border-radius: 12px;
-      padding: 14px 28px;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 12px 24px;
       display: flex;
       align-items: center;
-      gap: 32px;
-      font-size: 14px;
+      gap: 28px;
+      font-size: 13.5px;
       color: #1e3a8a;
     }
     .summary-box div { text-align: center; }
     .summary-box strong {
       display: block;
-      font-size: 22px;
+      font-size: 20px;
       margin-top: 2px;
       color: rgb(3, 64, 171);
     }
@@ -165,18 +149,18 @@
       flex-direction: column;
       justify-content: center;
       align-items: flex-end;
-      min-width: 280px;
+      min-width: 260px;
     }
     .save-btn {
       width: 100%;
       height: 100%;
-      min-height: 64px;
-      padding: 16px 32px;
+      min-height: 60px;
+      padding: 14px 28px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
-      border-radius: 12px;
-      font-size: 18px;
+      border-radius: 10px;
+      font-size: 17px;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.2s;
@@ -191,7 +175,7 @@
     }
 
     /* Invoice Styles */
-    #invoiceSection { display: none; max-width: 780px; }
+    #invoiceSection { display: none; max-width: 760px; margin: 0 auto; width: 100%; }
     .inv-header {
       display: flex;
       justify-content: space-between;
@@ -201,13 +185,13 @@
       margin-bottom: 18px;
     }
     .inv-title {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
       color: rgb(3, 64, 171);
       letter-spacing: 0.5px;
     }
     .inv-meta {
-      font-size: 15px;
+      font-size: 14px;
       color: #64748b;
       text-align: right;
     }
@@ -219,7 +203,7 @@
     .inv-table td {
       padding: 13px 10px;
       border-bottom: 1px solid #e2e8f0;
-      font-size: 16px;
+      font-size: 15.5px;
     }
     .inv-table td:first-child {
       color: #475569;
@@ -232,61 +216,61 @@
     }
     .inv-total-row {
       background: #eef4ff;
-      border-radius: 12px;
-      padding: 16px 22px;
-      margin-top: 20px;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-top: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1.5px solid #bfdbfe;
+      border: 1px solid #bfdbfe;
     }
     .inv-total-row span {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       color: #1e3a8a;
     }
     .inv-total-row strong {
-      font-size: 26px;
+      font-size: 24px;
       color: rgb(3, 64, 171);
     }
     .inv-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      max-width: 780px;
+      gap: 14px;
+      max-width: 760px;
       width: 100%;
       margin: 0 auto;
-      padding: 0 40px 32px;
+      padding: 0 28px 28px;
     }
     .btn-print {
-      padding: 14px;
+      padding: 13px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
-      border-radius: 12px;
-      font-size: 16px;
+      border-radius: 10px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
     }
     .btn-new {
-      padding: 14px;
+      padding: 13px;
       background: #e2e8f0;
       color: #1e293b;
       border: none;
-      border-radius: 12px;
-      font-size: 16px;
+      border-radius: 10px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
     }
     .inv-footer {
       text-align: center;
-      font-size: 14px;
+      font-size: 13.5px;
       color: #64748b;
-      margin-top: 20px;
+      margin-top: 18px;
     }
 
-    /* Tablet & Mobile Responsive */
-    @media (max-width: 960px) {
+    /* Responsive */
+    @media (max-width: 900px) {
       .form-grid { grid-template-columns: 1fr 1fr; }
       .bottom-bar { flex-direction: column; }
       .summary-box { justify-content: space-around; gap: 12px; }
@@ -294,8 +278,8 @@
     }
     @media (max-width: 600px) {
       .form-grid { grid-template-columns: 1fr; }
-      .content-area { padding: 16px 18px 22px; }
-      .inv-actions { padding: 0 18px 22px; }
+      .content-area { padding: 16px; }
+      .inv-actions { padding: 0 16px 20px; }
     }
   </style>
 </head>
