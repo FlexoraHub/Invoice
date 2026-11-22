@@ -19,10 +19,18 @@
       background: #ffffff;
       width: 100%;
       max-width: 430px;
-      padding: 24px;
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(3, 64, 171, 0.12);
-      border-top: 6px solid rgb(3, 64, 171);
+      overflow: hidden;
+    }
+    .banner-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 20px 24px 24px;
     }
     h2 {
       margin: 0 0 18px;
@@ -105,68 +113,93 @@
 <body>
 
 <div class="card">
-  <h2>Printer Job Entry</h2>
+  <!-- Banner Image -->
+  <img src="banner.png" alt="RRS FlexoraHUB Banner" class="banner-img" />
 
-  <label>Name of the Job</label>
-  <input type="text" id="jobPurpose" placeholder="Enter Job Name" />
+  <div class="card-body">
+    <h2>Printer Job Entry</h2>
 
-  <label>Number of Pages</label>
-  <input type="number" id="numPages" min="1" placeholder="" oninput="calculate()" />
+    <label>Name of the Job</label>
+    <input type="text" id="jobPurpose" placeholder="Enter Job Name" />
 
-  <label>Print Side</label>
-  <div class="toggle-group">
-    <button type="button" class="toggle-btn active" id="btnSingle" onclick="setSide('single')">Single Side</button>
-    <button type="button" class="toggle-btn" id="btnFrontBack" onclick="setSide('frontback')">Front & Back</button>
+    <label>Number of Pages</label>
+    <input type="number" id="numPages" min="1" placeholder="e.g. 10" oninput="calculate()" />
+
+    <label>Print Color</label>
+    <div class="toggle-group">
+      <button type="button" class="toggle-btn active" id="btnBW" onclick="setColor('bw')">Black & White</button>
+      <button type="button" class="toggle-btn" id="btnColor" onclick="setColor('color')">Color</button>
+    </div>
+
+    <label>Print Side</label>
+    <div class="toggle-group">
+      <button type="button" class="toggle-btn active" id="btnSingle" onclick="setSide('single')">Single Side</button>
+      <button type="button" class="toggle-btn" id="btnFrontBack" onclick="setSide('frontback')">Front & Back</button>
+    </div>
+
+    <label>Amount Mode</label>
+    <div class="toggle-group">
+      <button type="button" class="toggle-btn active" id="btnAuto" onclick="setMode('auto')">Set Automatic Amount</button>
+      <button type="button" class="toggle-btn" id="btnManual" onclick="setMode('manual')">Set Manual Amount</button>
+    </div>
+
+    <div id="autoBox">
+      <label id="rateLabel">Rate Per Sheet (₹)</label>
+      <input type="number" id="autoRate" step="0.01" min="0" value="2" oninput="saveDefaultRate(); calculate();" />
+    </div>
+
+    <div id="manualBox" style="display:none;">
+      <label>Total Amount Collected (₹)</label>
+      <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
+    </div>
+
+    <div class="summary-box">
+      <div>Paper QTY<strong id="dispQty">0</strong></div>
+      <div>Amt / Page<strong id="dispRate">₹0</strong></div>
+      <div>Total Amount<strong id="dispTotal">₹0</strong></div>
+    </div>
+
+    <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save Job</button>
+    <div id="status"></div>
   </div>
-
-  <label>Amount Mode</label>
-  <div class="toggle-group">
-    <button type="button" class="toggle-btn active" id="btnAuto" onclick="setMode('auto')">Set Automatic Amount</button>
-    <button type="button" class="toggle-btn" id="btnManual" onclick="setMode('manual')">Set Manual Amount</button>
-  </div>
-
-  <div id="autoBox">
-    <label id="rateLabel">Rate Per Sheet (₹)</label>
-    <input type="number" id="autoRate" step="0.01" min="0" value="0" oninput="saveDefaultRate(); calculate();" />
-  </div>
-
-  <div id="manualBox" style="display:none;">
-    <label>Total Amount Collected (₹)</label>
-    <input type="number" id="manualTotal" step="0.01" min="0" placeholder="Enter Price " oninput="calculate()" />
-  </div>
-
-  <div class="summary-box">
-    <div>Paper QTY<strong id="dispQty">0</strong></div>
-    <div>Amt / Page<strong id="dispRate">₹0</strong></div>
-    <div>Total Amount<strong id="dispTotal">₹0</strong></div>
-  </div>
-
-  <button type="button" class="save-btn" id="saveBtn" onclick="saveJob()">Save Job</button>
-  <div id="status"></div>
 </div>
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_Rqv5J_psAZw45CKIWQXBDWa-uancPp8gaoIVKTZbc9viMDcx90wB3HJYHeT4tvLsLQ/exec";
 
+  let printColor = "bw";
   let printSide = "single";
   let amountMode = "auto";
 
-  function getSavedRate(side) {
-    const key = side === "single" ? "rrs_rate_single" : "rrs_rate_fb";
-    const defaultVal = side === "single" ? 2 : 3;
-    return localStorage.getItem(key) || defaultVal;
+  function getSavedRate(color, side) {
+    const key = "rrs_rate_" + color + "_" + side;
+    const defaults = {
+      "bw_single": 2,
+      "bw_frontback": 3,
+      "color_single": 10,
+      "color_frontback": 15
+    };
+    return localStorage.getItem(key) || defaults[color + "_" + side];
   }
 
   function saveDefaultRate() {
-    const key = printSide === "single" ? "rrs_rate_single" : "rrs_rate_fb";
+    const key = "rrs_rate_" + printColor + "_" + printSide;
     localStorage.setItem(key, document.getElementById("autoRate").value);
+  }
+
+  function setColor(color) {
+    printColor = color;
+    document.getElementById("btnBW").classList.toggle("active", color === "bw");
+    document.getElementById("btnColor").classList.toggle("active", color === "color");
+    document.getElementById("autoRate").value = getSavedRate(printColor, printSide);
+    calculate();
   }
 
   function setSide(side) {
     printSide = side;
     document.getElementById("btnSingle").classList.toggle("active", side === "single");
     document.getElementById("btnFrontBack").classList.toggle("active", side === "frontback");
-    document.getElementById("autoRate").value = getSavedRate(side);
+    document.getElementById("autoRate").value = getSavedRate(printColor, printSide);
     calculate();
   }
 
@@ -204,12 +237,12 @@
   }
 
   async function saveJob() {
-    const jobPurpose = document.getElementById("jobPurpose").value.trim();
+    const rawJobName = document.getElementById("jobPurpose").value.trim();
     const { paperQty, amtPerPage, totalAmount } = calculate();
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("saveBtn");
 
-    if (!jobPurpose) {
+    if (!rawJobName) {
       statusEl.style.color = "red";
       statusEl.innerText = "Job Name enter pannunga!";
       return;
@@ -219,6 +252,9 @@
       statusEl.innerText = "Pages matrum Amount sariya kudunga!";
       return;
     }
+
+    const colorTag = printColor === "bw" ? "Black & White" : "Color";
+    const finalJobPurpose = rawJobName + " (" + colorTag + ")";
 
     btn.disabled = true;
     btn.innerText = "Saving...";
@@ -230,7 +266,7 @@
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
-          jobPurpose: jobPurpose,
+          jobPurpose: finalJobPurpose,
           paperQty: paperQty,
           amtPerPage: amtPerPage,
           amount: totalAmount
@@ -238,7 +274,7 @@
       });
 
       statusEl.style.color = "green";
-      statusEl.innerText = "Job Saved to Sheets! (" + jobPurpose + " - ₹" + totalAmount + ")";
+      statusEl.innerText = "Sheet-la save aayiduchu! (" + finalJobPurpose + " - ₹" + totalAmount + ")";
       document.getElementById("jobPurpose").value = "";
       document.getElementById("numPages").value = "";
       document.getElementById("manualTotal").value = "";
@@ -253,7 +289,7 @@
   }
 
   // Initial load
-  document.getElementById("autoRate").value = getSavedRate("single");
+  document.getElementById("autoRate").value = getSavedRate("bw", "single");
 </script>
 
 </body>
