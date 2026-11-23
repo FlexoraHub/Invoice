@@ -224,6 +224,30 @@
       margin-top: 2px;
       color: rgb(3, 64, 171);
     }
+
+    /* Optional Advance Input Box in the Middle */
+    .advance-box {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 220px;
+    }
+    .advance-box label {
+      font-size: 12.5px;
+      color: #475569;
+      margin-bottom: 5px;
+    }
+    .advance-box input {
+      padding: 8px 11px;
+      font-size: 16px;
+      font-weight: 700;
+      color: rgb(3, 64, 171);
+    }
+
     .action-right {
       display: flex;
       flex-direction: column;
@@ -331,11 +355,35 @@
     .col-qtyprice { text-align: right; color: #334155 !important; font-weight: 600; }
     .col-total { text-align: right; font-weight: 700; }
 
+    /* Invoice Totals & Advance Breakdown */
+    .inv-summary-block {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .inv-sub-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    .inv-sub-row span {
+      font-weight: 600;
+      color: #475569;
+    }
+    .inv-sub-row strong {
+      font-size: 17px;
+      color: #0f172a;
+    }
     .inv-total-row {
       background: #eef4ff;
       border-radius: 10px;
       padding: 15px 18px;
-      margin-top: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -412,7 +460,7 @@
       .product-row > div:first-child { grid-column: 1 / -1; }
       .bottom-bar { flex-direction: column; }
       .summary-box { justify-content: space-around; }
-      .action-right { width: 100%; }
+      .advance-box, .action-right { width: 100%; }
     }
   </style>
 </head>
@@ -450,6 +498,12 @@
           <div>Final Grand Total<strong id="dispGrandTotal">₹0</strong></div>
         </div>
 
+        <!-- Optional Advance Amount Input -->
+        <div class="advance-box">
+          <label for="advanceAmount">Advance Amount (₹) <span style="font-weight:400;color:#64748b;">(Optional)</span></label>
+          <input type="number" id="advanceAmount" min="0" step="0.01" placeholder="0" />
+        </div>
+
         <div class="action-right">
           <button type="button" class="save-btn" id="generateBtn" onclick="generateInvoice()">Save & Download Invoice</button>
           <div id="status"></div>
@@ -485,9 +539,24 @@
         <tbody id="invProdBody"></tbody>
       </table>
 
-      <div class="inv-total-row">
-        <span>Total Amount</span>
-        <strong id="invGrandTotal">₹0</strong>
+      <!-- Totals & Advance Breakdown -->
+      <div class="inv-summary-block">
+        <!-- Shown ONLY when Advance Amount > 0 -->
+        <div class="inv-sub-row" id="invSubTotalRow" style="display: none;">
+          <span>Total Amount</span>
+          <strong id="invSubTotal">₹0</strong>
+        </div>
+
+        <div class="inv-sub-row" id="invAdvanceRow" style="display: none;">
+          <span>Advance Amount</span>
+          <strong id="invAdvance" style="color: #059669;">- ₹0</strong>
+        </div>
+
+        <!-- Main Highlight Row: Shows "Total Amount" normally, or "Balance to Pay" if Advance is paid -->
+        <div class="inv-total-row">
+          <span id="invFinalLabel">Total Amount</span>
+          <strong id="invGrandTotal">₹0</strong>
+        </div>
       </div>
 
       <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
@@ -613,6 +682,7 @@
 
   async function generateInvoice() {
     const customerName = document.getElementById("customerName").value.trim();
+    const advanceVal = parseFloat(document.getElementById("advanceAmount").value) || 0;
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("generateBtn");
 
@@ -640,6 +710,12 @@
       const rowTotal = +(qty * price).toFixed(2);
       grandTotal = +(grandTotal + rowTotal).toFixed(2);
       items.push({ name, qty, price, total: rowTotal });
+    }
+
+    if (advanceVal < 0 || advanceVal > grandTotal) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Advance Amount total-vida adhigama irukka koodadhu!";
+      return;
     }
 
     btn.disabled = true;
@@ -684,7 +760,21 @@
         tbody.appendChild(tr);
       });
 
-      document.getElementById("invGrandTotal").innerText = "₹" + grandTotal;
+      // Handle Advance & Balance to Pay display in Invoice
+      if (advanceVal > 0) {
+        const balanceToPay = +(grandTotal - advanceVal).toFixed(2);
+        document.getElementById("invSubTotalRow").style.display = "flex";
+        document.getElementById("invAdvanceRow").style.display = "flex";
+        document.getElementById("invSubTotal").innerText = "₹" + grandTotal;
+        document.getElementById("invAdvance").innerText = "₹" + advanceVal;
+        document.getElementById("invFinalLabel").innerText = "Balance to Pay";
+        document.getElementById("invGrandTotal").innerText = "₹" + balanceToPay;
+      } else {
+        document.getElementById("invSubTotalRow").style.display = "none";
+        document.getElementById("invAdvanceRow").style.display = "none";
+        document.getElementById("invFinalLabel").innerText = "Total Amount";
+        document.getElementById("invGrandTotal").innerText = "₹" + grandTotal;
+      }
 
       document.getElementById("formSection").style.display = "none";
       document.getElementById("invoiceSection").style.display = "block";
@@ -705,6 +795,7 @@
 
   function newEntry() {
     document.getElementById("customerName").value = "";
+    document.getElementById("advanceAmount").value = "";
     document.getElementById("productList").innerHTML = "";
     rowCounter = 0;
     addProductRow();
