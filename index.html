@@ -302,34 +302,35 @@
       margin-top: 18px;
     }
 
-    /* Stock Management Section */
-    #stockSection { display: none; }
+    /* Section 2: Stocks (Live Inventory View Only) */
+    #stockViewSection { display: none; }
     .stock-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      border-bottom: 1.5px solid #eef4ff;
+      padding-bottom: 12px;
     }
     .refresh-btn {
-      padding: 8px 16px;
+      padding: 9px 18px;
       background: #eef4ff;
       color: rgb(3, 64, 171);
       border: 1px solid #bfdbfe;
       border-radius: 8px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 13.5px;
       cursor: pointer;
     }
     .stock-cards {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 18px;
     }
     .stock-card {
       border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 14px 16px;
+      border-radius: 12px;
+      padding: 16px 18px;
       background: #f8fafc;
       position: relative;
     }
@@ -353,8 +354,8 @@
       color: #dc2626;
       border: 1px solid #fecaca;
       border-radius: 6px;
-      padding: 3px 8px;
-      font-size: 11px;
+      padding: 3px 9px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.15s;
@@ -364,13 +365,13 @@
       color: #ffffff;
     }
     .stock-name {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       color: #0f172a;
-      margin: 6px 0 8px;
+      margin: 8px 0 10px;
     }
     .stock-qty {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 800;
       color: rgb(3, 64, 171);
     }
@@ -385,43 +386,45 @@
     .empty-stock-msg {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 24px;
+      padding: 32px;
       background: #f8fafc;
       border: 1.5px dashed #cbd5e1;
-      border-radius: 10px;
+      border-radius: 12px;
       color: #475569;
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: 600;
     }
+
+    /* Section 3: Manage Stocks (Add & Update Forms Only) */
+    #manageStockSection { display: none; }
     .stock-forms {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      border-top: 1.5px solid #e2e8f0;
-      padding-top: 20px;
+      gap: 26px;
     }
     .stock-box {
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 16px 20px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 20px 24px;
       background: #ffffff;
     }
     .stock-box h3 {
-      margin: 0 0 12px;
-      font-size: 16px;
+      margin: 0 0 16px;
+      font-size: 18px;
       color: rgb(3, 64, 171);
     }
-    .stock-box .field { margin-bottom: 12px; }
+    .stock-box .field { margin-bottom: 14px; }
     .btn-stock-save {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
       border-radius: 8px;
-      font-size: 15px;
+      font-size: 15.5px;
       font-weight: 700;
       cursor: pointer;
+      margin-top: 4px;
     }
     .btn-stock-save:disabled { background: #94a3b8; cursor: not-allowed; }
 
@@ -435,6 +438,8 @@
       .form-grid, .stock-cards, .stock-forms { grid-template-columns: 1fr; }
       .content-area { padding: 16px; }
       .inv-actions { padding: 0 16px 20px; }
+      .nav-tabs { padding: 0 12px; gap: 4px; }
+      .nav-tab { padding: 11px 12px; font-size: 13.5px; }
     }
   </style>
 </head>
@@ -446,15 +451,16 @@
       <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
     </div>
 
-    <!-- Navigation Tabs -->
+    <!-- 3 Separate Navigation Tabs -->
     <div class="nav-tabs" id="navTabs">
       <button type="button" class="nav-tab active" id="tabBilling" onclick="switchTab('billing')">Printer Billing & Invoice</button>
-      <button type="button" class="nav-tab" id="tabStock" onclick="switchTab('stock')">
-        Stock Management <span class="low-badge" id="lowStockBadge">0 Low</span>
+      <button type="button" class="nav-tab" id="tabStocks" onclick="switchTab('stocks')">
+        Stocks <span class="low-badge" id="lowStockBadge">0 Low</span>
       </button>
+      <button type="button" class="nav-tab" id="tabManageStocks" onclick="switchTab('manage')">Manage Stocks</button>
     </div>
 
-    <!-- BILLING FORM SECTION -->
+    <!-- SECTION 1: PRINTER BILLING & INVOICE -->
     <div class="content-area" id="formSection">
       <h2>Printer Job Entry</h2>
 
@@ -552,7 +558,7 @@
       </div>
     </div>
 
-    <!-- INVOICE SECTION -->
+    <!-- INVOICE PREVIEW SECTION -->
     <div class="content-area" id="invoiceSection">
       <div class="inv-header">
         <div class="inv-title">INVOICE</div>
@@ -597,8 +603,8 @@
       <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
     </div>
 
-    <!-- STOCK MANAGEMENT SECTION -->
-    <div class="content-area" id="stockSection">
+    <!-- SECTION 2: STOCKS (Live Stock Inventory Only) -->
+    <div class="content-area" id="stockViewSection">
       <div class="stock-top-bar">
         <h2 style="border:none; margin:0; padding:0;">Live Stock Inventory</h2>
         <button type="button" class="refresh-btn" onclick="loadStock()">↻ Refresh Stock</button>
@@ -607,6 +613,11 @@
       <div class="stock-cards" id="stockCardsGrid">
         <div style="color:#64748b; font-size:14px;">Loading stock from Google Sheet...</div>
       </div>
+    </div>
+
+    <!-- SECTION 3: MANAGE STOCKS (Add & Update Forms Only) -->
+    <div class="content-area" id="manageStockSection">
+      <h2>Manage Stocks</h2>
 
       <div class="stock-forms">
         <div class="stock-box">
@@ -697,17 +708,22 @@
 
   function switchTab(tab) {
     document.getElementById("tabBilling").classList.toggle("active", tab === "billing");
-    document.getElementById("tabStock").classList.toggle("active", tab === "stock");
+    document.getElementById("tabStocks").classList.toggle("active", tab === "stocks");
+    document.getElementById("tabManageStocks").classList.toggle("active", tab === "manage");
 
+    document.getElementById("formSection").style.display = "none";
     document.getElementById("invoiceSection").style.display = "none";
     document.getElementById("invActions").style.display = "none";
+    document.getElementById("stockViewSection").style.display = "none";
+    document.getElementById("manageStockSection").style.display = "none";
 
     if (tab === "billing") {
       document.getElementById("formSection").style.display = "flex";
-      document.getElementById("stockSection").style.display = "none";
-    } else {
-      document.getElementById("formSection").style.display = "none";
-      document.getElementById("stockSection").style.display = "flex";
+    } else if (tab === "stocks") {
+      document.getElementById("stockViewSection").style.display = "flex";
+      loadStock();
+    } else if (tab === "manage") {
+      document.getElementById("manageStockSection").style.display = "flex";
       loadStock();
     }
   }
@@ -967,7 +983,7 @@
         paperSelect.innerHTML = "";
 
         if (data.stock.length === 0) {
-          grid.innerHTML = `<div class="empty-stock-msg">No stock items added yet. Use "+ Add New Stock Item" below or add directly in your Google Sheet!</div>`;
+          grid.innerHTML = `<div class="empty-stock-msg">No stock items added yet. Go to "Manage Stocks" tab to add your items!</div>`;
           select.innerHTML = `<option value="">-- No items in stock --</option>`;
         } else {
           data.stock.forEach(item => {
