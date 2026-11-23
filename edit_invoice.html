@@ -109,7 +109,7 @@
       border-color: rgb(3, 64, 171);
     }
 
-    /* Search & Filter Bar */
+    /* Filter Bar */
     .filter-bar {
       display: flex;
       gap: 14px;
@@ -192,10 +192,10 @@
       background: #022d7a;
     }
 
-    /* Edit Payment Panel */
+    /* Edit / View Control Panel */
     #editPanel {
       display: none;
-      max-width: 720px;
+      max-width: 740px;
       margin: 0 auto;
       width: 100%;
     }
@@ -217,7 +217,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
     .stat-pill {
       background: #f8fafc;
@@ -238,15 +238,6 @@
       margin-top: 4px;
       color: #0f172a;
     }
-    .history-note {
-      font-size: 13px;
-      color: #475569;
-      background: #f8fafc;
-      padding: 10px 14px;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 18px;
-    }
     .payment-entry-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -264,187 +255,233 @@
       color: rgb(3, 64, 171);
       text-align: right;
     }
+
+    /* Toggle Switch for Print With Stamp / Without Stamp */
+    .stamp-toggle-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fef2f2;
+      border: 1.5px solid #fecaca;
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 18px;
+    }
+    .stamp-toggle-bar span {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #991b1b;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #dc2626; }
+    input:checked + .slider:before { transform: translateX(24px); }
+
     .edit-btn-row {
       display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 14px;
+      grid-template-columns: 1fr 1.4fr 1.6fr;
+      gap: 12px;
     }
     .btn-back-list {
-      padding: 14px;
+      padding: 13px;
       background: #e2e8f0;
       color: #1e293b;
       border: none;
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-view-only {
+      padding: 13px;
+      background: #eef4ff;
+      color: rgb(3, 64, 171);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 10px;
+      font-size: 14.5px;
       font-weight: 700;
       cursor: pointer;
     }
     .save-btn {
-      padding: 14px 24px;
+      padding: 13px 18px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
     }
     .save-btn:hover { background: #022d7a; }
     .save-btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    /* INVOICE TEMPLATE STYLES */
+    /* ==========================================================
+       PAYMENT STATEMENT INVOICE TEMPLATE (AS PER YOUR SPECS)
+       ========================================================== */
     #invoiceSection {
       display: none;
       width: 100%;
       max-width: 680px;
       margin: 0 auto;
-      padding: 20px 28px 28px;
+      padding: 20px 28px 24px;
     }
-    .inv-header {
+    .stmt-top-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px dashed #cbd5e1;
       padding-bottom: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
-    .inv-title {
-      font-size: 21px;
-      font-weight: 800;
-      color: rgb(3, 64, 171);
-      letter-spacing: 0.5px;
-    }
-    .inv-meta {
-      font-size: 13px;
+    .stmt-cust-block span {
+      display: block;
+      font-size: 12px;
       color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .stmt-cust-block strong {
+      font-size: 18px;
+      color: #0f172a;
+      font-weight: 800;
+    }
+    .stmt-inv-block {
       text-align: right;
     }
-    .inv-customer-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 11px 6px;
-      border-bottom: 1.5px solid #e2e8f0;
-      margin-bottom: 18px;
-      font-size: 15px;
-    }
-    .inv-customer-line span {
-      color: #475569;
+    .stmt-inv-block span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
       font-weight: 600;
-    }
-    .inv-customer-line strong {
-      color: #0f172a;
-      font-weight: 700;
-      font-size: 16px;
-    }
-    .inv-section-heading {
-      font-size: 14px;
-      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: rgb(3, 64, 171);
-      margin: 0 0 8px;
     }
-    .inv-prod-table {
+    .stmt-inv-block strong {
+      font-size: 18px;
+      color: rgb(3, 64, 171);
+      font-weight: 800;
+    }
+
+    .stmt-heading {
+      font-size: 15px;
+      font-weight: 800;
+      color: rgb(3, 64, 171);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin: 0 0 10px;
+    }
+
+    .stmt-table-wrapper {
+      position: relative;
+    }
+    .stmt-table {
       width: 100%;
       border-collapse: collapse;
     }
-    .inv-prod-table th {
+    .stmt-table th {
       background: #f1f5f9;
       color: #334155;
       font-size: 13px;
       font-weight: 700;
-      padding: 10px 8px;
+      padding: 10px 10px;
       border-top: 1px solid #cbd5e1;
       border-bottom: 1.5px solid #cbd5e1;
     }
-    .inv-prod-table td {
-      padding: 11px 8px;
+    .stmt-table td {
+      padding: 12px 10px;
       border-bottom: 1px solid #e2e8f0;
       font-size: 14.5px;
       color: #0f172a;
     }
-    .col-sno { width: 52px; text-align: left; font-weight: 700; color: #475569 !important; }
-    .col-name { text-align: left; font-weight: 600; }
-    .col-qtyprice { text-align: right; color: #334155 !important; font-weight: 600; }
-    .col-total { text-align: right; font-weight: 700; }
+    .col-desc { text-align: left; font-weight: 700; }
+    .col-date { text-align: center; color: #475569 !important; font-weight: 600; }
+    .col-amt  { text-align: right; font-weight: 700; }
 
-    .inv-summary-block {
+    /* Center PAID Stamp Overlay */
+    .center-paid-stamp {
+      display: none;
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-12deg);
+      border: 4px solid rgba(220, 38, 38, 0.85);
+      color: rgba(220, 38, 38, 0.85);
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      padding: 8px 34px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .stmt-balance-box {
+      background: #eef4ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 14px 18px;
       margin-top: 18px;
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .inv-sub-row {
-      display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 18px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 15px;
     }
-    .inv-sub-row span {
-      font-weight: 600;
-      color: #475569;
-    }
-    .inv-sub-row strong {
-      font-size: 17px;
-      color: #0f172a;
-    }
-    .inv-total-row {
-      background: #eef4ff;
-      border-radius: 10px;
-      padding: 15px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1.5px solid #bfdbfe;
-    }
-    .inv-total-row span {
-      font-size: 16px;
+    .stmt-balance-box span {
+      font-size: 15.5px;
       font-weight: 700;
       color: #1e3a8a;
     }
-    .inv-total-row strong {
-      font-size: 24px;
+    .stmt-balance-box strong {
+      font-size: 22px;
       color: rgb(3, 64, 171);
     }
 
-    /* Red PAID Stamp */
-    .paid-stamp-box {
-      display: none;
-      margin-top: 16px;
-      text-align: center;
-    }
-    .paid-stamp {
-      display: inline-block;
-      border: 3.5px solid #dc2626;
-      color: #dc2626;
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      padding: 6px 32px;
-      border-radius: 8px;
-      text-transform: uppercase;
-    }
-
-    .inv-footer {
-      text-align: center;
-      font-size: 13px;
+    .stmt-bottom-note {
+      margin-top: 24px;
+      text-align: right;
+      font-size: 11.5px;
+      font-weight: 600;
       color: #64748b;
-      margin-top: 18px;
+      font-style: italic;
     }
 
+    /* Preview Action Bar */
     .inv-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
       max-width: 680px;
       width: 100%;
       margin: 0 auto;
       padding: 0 28px 28px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .inv-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
     .btn-print {
       padding: 13px;
@@ -506,12 +543,12 @@
       <div class="page-tag">View All & Edit Commercial Invoices</div>
     </div>
 
-    <!-- LIST OF ALL INVOICES SECTION -->
+    <!-- 1. ALL INVOICES LIST SECTION -->
     <div class="content-area" id="listSection">
       <h2>All Commercial Invoices</h2>
 
       <div class="filter-bar">
-        <input type="text" id="searchInput" placeholder="Search by Invoice No (e.g. 189) or Customer Name..." oninput="renderTable()" />
+        <input type="text" id="searchInput" placeholder="Search by Invoice No (e.g. 180) or Customer Name..." oninput="renderTable()" />
         <button type="button" class="btn-refresh" onclick="loadInvoices()">↻ Refresh List</button>
       </div>
 
@@ -520,11 +557,11 @@
           <thead>
             <tr>
               <th>Invoice No</th>
-              <th>Date</th>
+              <th>Day & Date</th>
               <th>Customer Name</th>
               <th>Invoice Total</th>
               <th>Received</th>
-              <th>Balance / Status</th>
+              <th>Balance Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -535,18 +572,18 @@
       </div>
     </div>
 
-    <!-- EDIT PAYMENT SECTION (Amount Edit Only, Products Locked) -->
+    <!-- 2. EDIT / VIEW INVOICE CONTROL PANEL -->
     <div class="content-area" id="editPanel">
-      <h2>Update Balance Payment</h2>
+      <h2>View / Edit Invoice Payment</h2>
 
       <div class="edit-card">
         <div class="edit-card-header">
           <div>
-            <div style="font-size:13px; color:#64748b; font-weight:600;">Name of the Customer</div>
+            <div style="font-size:12.5px; color:#64748b; font-weight:600;">Customer Name</div>
             <div id="editCustName" style="font-size:20px; font-weight:800; color:#0f172a;">-</div>
           </div>
           <div style="text-align:right;">
-            <div id="editInvNo" style="font-size:17px; font-weight:800; color:rgb(3, 64, 171);">[RRS-179]</div>
+            <div id="editInvNo" style="font-size:17px; font-weight:800; color:rgb(3, 64, 171);">[RRS-180]</div>
             <div id="editInvDate" style="font-size:13px; color:#64748b;">-</div>
           </div>
         </div>
@@ -558,93 +595,103 @@
           </div>
           <div class="stat-pill">
             <span>Advance Received</span>
-            <strong id="editPrevReceived" style="color:#059669;">₹0</strong>
+            <strong id="editAdvAmt" style="color:#059669;">₹0</strong>
           </div>
           <div class="stat-pill">
-            <span>Balance Amount to Pay</span>
+            <span>Balance to Collect</span>
             <strong id="editCurrBalance" style="color:#dc2626;">₹0</strong>
           </div>
         </div>
 
-        <div class="history-note" id="editHistoryText">Received History: None</div>
-
-        <div class="payment-entry-grid">
+        <div class="payment-entry-grid" id="paymentInputGrid">
           <div>
-            <label>Balance Amount Received from Customer (₹)</label>
-            <input type="number" id="newPaymentInput" min="0" step="0.01" placeholder="Enter amount received now" oninput="calculateTotalReceived()" />
+            <label>Amount Received Now from Customer (₹)</label>
+            <input type="number" id="newPaymentInput" min="0" step="0.01" placeholder="Enter amount received" oninput="calculateTotalReceived()" />
           </div>
           <div>
-            <label>Total Amount Received from Customer</label>
+            <label>Total Received After Update</label>
             <div class="calc-received-box" id="editTotalReceivedDisp">₹0</div>
           </div>
         </div>
 
+        <!-- Print With Stamp / Without Stamp Toggle (Shown when Balance is 0) -->
+        <div class="stamp-toggle-bar" id="editStampToggleBox" style="display: none;">
+          <span id="editStampLabel">Print Mode: Print With Stamp (PAID)</span>
+          <label class="switch">
+            <input type="checkbox" id="stampToggleCheck" checked onchange="syncStampToggle(this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
         <div class="edit-btn-row">
-          <button type="button" class="btn-back-list" onclick="backToList()">← Back to List</button>
+          <button type="button" class="btn-back-list" onclick="backToList()">← Back</button>
+          <button type="button" class="btn-view-only" onclick="previewCurrentInvoice()">Download Invoice</button>
           <button type="button" class="save-btn" id="btnSavePayment" onclick="savePaymentUpdate()">Save & Download Invoice</button>
         </div>
         <div id="editStatus" style="margin-top:10px; text-align:center; font-size:13.5px; font-weight:600;"></div>
       </div>
     </div>
 
-    <!-- INVOICE PREVIEW & PDF TEMPLATE -->
+    <!-- 3. PAYMENT STATEMENT INVOICE TEMPLATE -->
     <div id="invoiceSection">
-      <div class="inv-header">
-        <div class="inv-title">INVOICE</div>
-        <div class="inv-meta">
-          <div id="invNo" style="font-weight: 700; color: #0f172a; font-size: 14px;">[RRS-175]</div>
-          <div id="invDate"></div>
+      <!-- Top Row: Left Customer Name | Right Invoice No -->
+      <div class="stmt-top-row">
+        <div class="stmt-cust-block">
+          <span>Customer Name</span>
+          <strong id="stmtCustName">-</strong>
+        </div>
+        <div class="stmt-inv-block">
+          <span>Invoice No</span>
+          <strong id="stmtInvNo">[RRS-180]</strong>
         </div>
       </div>
 
-      <div class="inv-customer-line">
-        <span>Name of the Customer</span>
-        <strong id="invCustomer">-</strong>
+      <!-- Heading: Payment Details -->
+      <div class="stmt-heading">Payment Details</div>
+
+      <!-- Payment Details Table + Center PAID Stamp -->
+      <div class="stmt-table-wrapper">
+        <table class="stmt-table">
+          <thead>
+            <tr>
+              <th class="col-desc">Description</th>
+              <th class="col-date">Date</th>
+              <th class="col-amt">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="stmtBody"></tbody>
+        </table>
+
+        <!-- Center PAID Stamp -->
+        <div class="center-paid-stamp" id="centerPaidStamp">PAID</div>
       </div>
 
-      <div class="inv-section-heading">List of Products</div>
-      <table class="inv-prod-table">
-        <thead>
-          <tr>
-            <th class="col-sno">S.No</th>
-            <th class="col-name">Product Name</th>
-            <th class="col-qtyprice">Qty × Price</th>
-            <th class="col-total">Total</th>
-          </tr>
-        </thead>
-        <tbody id="invProdBody"></tbody>
-      </table>
-
-      <div class="inv-summary-block">
-        <div class="inv-sub-row" id="invSubTotalRow" style="display: none;">
-          <span>Total Amount</span>
-          <strong id="invSubTotal">₹0</strong>
-        </div>
-
-        <div class="inv-sub-row" id="invAdvanceRow" style="display: none;">
-          <span>Total Amount Received from Customer</span>
-          <strong id="invAdvance" style="color: #059669;">₹0</strong>
-        </div>
-
-        <div class="inv-total-row">
-          <span id="invFinalLabel">Total Amount</span>
-          <strong id="invGrandTotal">₹0</strong>
-        </div>
+      <!-- Balance Box -->
+      <div class="stmt-balance-box">
+        <span>Balance Amount to Collect</span>
+        <strong id="stmtBalanceAmt">₹0</strong>
       </div>
 
-      <!-- Red PAID Stamp when Total Received == Invoice Total -->
-      <div class="paid-stamp-box" id="paidStampBox">
-        <div class="paid-stamp">PAID</div>
-      </div>
-
-      <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
+      <!-- Bottom Right Corner Note -->
+      <div class="stmt-bottom-note">Computer Generated Invoice</div>
     </div>
   </div>
 
-  <!-- Action Buttons (PDF-la varaadhu) -->
-  <div class="inv-actions" id="invActions" style="display: none;">
-    <button type="button" class="btn-print" onclick="downloadPDF()">Download PDF Again</button>
-    <button type="button" class="btn-new" onclick="backToList()">← Back to All Invoices</button>
+  <!-- Preview Actions (Not included in PDF) -->
+  <div class="inv-actions" id="invActions">
+    <!-- Stamp Toggle also accessible right before downloading -->
+    <div class="stamp-toggle-bar" id="previewStampToggleBox" style="display: none; margin-bottom: 0;">
+      <span id="previewStampLabel">Print Mode: Print With Stamp (PAID)</span>
+      <label class="switch">
+        <input type="checkbox" id="previewStampCheck" checked onchange="syncStampToggle(this.checked)" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="inv-btn-grid">
+      <button type="button" class="btn-print" onclick="downloadPDF()">Download Invoice PDF</button>
+      <button type="button" class="btn-new" onclick="backToList()">← Back to All Invoices</button>
+    </div>
   </div>
 </div>
 
@@ -654,6 +701,25 @@
   let allInvoices = [];
   let selectedInv = null;
   let currentPdfFilename = "Invoice.pdf";
+  let printWithStamp = true;
+
+  function syncStampToggle(isChecked) {
+    printWithStamp = isChecked;
+    document.getElementById("stampToggleCheck").checked = isChecked;
+    document.getElementById("previewStampCheck").checked = isChecked;
+
+    const labelText = isChecked
+      ? "Print Mode: Print With Stamp (PAID)"
+      : "Print Mode: Print Without Stamp";
+    document.getElementById("editStampLabel").innerText = labelText;
+    document.getElementById("previewStampLabel").innerText = labelText;
+
+    // Update live stamp visibility in invoice preview
+    const stampEl = document.getElementById("centerPaidStamp");
+    if (stampEl.dataset.isZero === "true") {
+      stampEl.style.display = isChecked ? "block" : "none";
+    }
+  }
 
   async function loadInvoices() {
     const tbody = document.getElementById("invoicesTableBody");
@@ -688,7 +754,7 @@
     filtered.forEach(inv => {
       const isPaid = inv.balanceAmount <= 0;
       const statusBadge = isPaid
-        ? `<span class="badge-paid">PAID</span>`
+        ? `<span class="badge-paid">PAID (₹0)</span>`
         : `<span class="badge-bal">Bal: ₹${inv.balanceAmount}</span>`;
 
       const tr = document.createElement("tr");
@@ -713,13 +779,18 @@
     document.getElementById("editInvNo").innerText = selectedInv.invoiceNo;
     document.getElementById("editInvDate").innerText = selectedInv.invoiceDate;
     document.getElementById("editTotalAmt").innerText = "₹" + selectedInv.totalAmount;
-    document.getElementById("editPrevReceived").innerText = "₹" + selectedInv.receivedAmount;
+    document.getElementById("editAdvAmt").innerText = "₹" + selectedInv.advanceAmount;
     document.getElementById("editCurrBalance").innerText = "₹" + selectedInv.balanceAmount;
-    document.getElementById("editHistoryText").innerText = "Received History (Date & Amount): " + (selectedInv.history || "No payments recorded yet");
 
     document.getElementById("newPaymentInput").value = "";
     document.getElementById("editTotalReceivedDisp").innerText = "₹" + selectedInv.receivedAmount;
     document.getElementById("editStatus").innerText = "";
+
+    // If balance is already 0, show Stamp Toggle & disable adding more payment
+    const isAlreadyPaid = selectedInv.balanceAmount <= 0;
+    document.getElementById("paymentInputGrid").style.display = isAlreadyPaid ? "none" : "grid";
+    document.getElementById("btnSavePayment").style.display = isAlreadyPaid ? "none" : "block";
+    document.getElementById("editStampToggleBox").style.display = isAlreadyPaid ? "flex" : "none";
 
     document.getElementById("listSection").style.display = "none";
     document.getElementById("invoiceSection").style.display = "none";
@@ -740,6 +811,94 @@
     document.getElementById("invActions").style.display = "none";
     document.getElementById("listSection").style.display = "flex";
     loadInvoices();
+  }
+
+  function parseHistoryEntries(rawHistory) {
+    const entries = [];
+    if (!rawHistory) return entries;
+    const parts = rawHistory.split(";;");
+    parts.forEach(p => {
+      const seg = p.split("|");
+      if (seg.length === 2) {
+        entries.push({ date: seg[0].trim(), amount: Number(seg[1]) || 0 });
+      }
+    });
+    return entries;
+  }
+
+  function renderStatementInvoice(invObj, extraPaymentObj) {
+    const cleanInv = invObj.invoiceNo.replace(/[\[\]]/g, "");
+    const safeCustomer = invObj.customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
+    currentPdfFilename = safeCustomer + "_" + cleanInv + "_Statement.pdf";
+
+    document.getElementById("stmtCustName").innerText = invObj.customerName;
+    document.getElementById("stmtInvNo").innerText = invObj.invoiceNo;
+
+    const tbody = document.getElementById("stmtBody");
+    tbody.innerHTML = "";
+
+    // Row 1: Invoice Amount (Left: Invoice No, Center: Date, Right: Total Amount)
+    const trInv = document.createElement("tr");
+    trInv.innerHTML = `
+      <td class="col-desc">Invoice Amount (${invObj.invoiceNo})</td>
+      <td class="col-date">${invObj.invoiceDate}</td>
+      <td class="col-amt">₹${invObj.totalAmount}</td>
+    `;
+    tbody.appendChild(trInv);
+
+    // Row 2: Advance (Only if Advance > 0)
+    if (invObj.advanceAmount > 0) {
+      const trAdv = document.createElement("tr");
+      trAdv.innerHTML = `
+        <td class="col-desc">Advance</td>
+        <td class="col-date">${invObj.invoiceDate}</td>
+        <td class="col-amt" style="color:#059669;">₹${invObj.advanceAmount}</td>
+      `;
+      tbody.appendChild(trAdv);
+    }
+
+    // Subsequent Rows: Amount 1, Amount 2, Amount 3...
+    const historyList = parseHistoryEntries(invObj.historyRaw);
+    if (extraPaymentObj && extraPaymentObj.amount > 0) {
+      historyList.push(extraPaymentObj);
+    }
+
+    let instSum = 0;
+    historyList.forEach((entry, idx) => {
+      instSum += entry.amount;
+      const trPay = document.createElement("tr");
+      trPay.innerHTML = `
+        <td class="col-desc">Amount ${idx + 1}</td>
+        <td class="col-date">${entry.date}</td>
+        <td class="col-amt" style="color:#059669;">₹${entry.amount}</td>
+      `;
+      tbody.appendChild(trPay);
+    });
+
+    const totalReceived = +(invObj.advanceAmount + instSum).toFixed(2);
+    const finalBalance = Math.max(0, +(invObj.totalAmount - totalReceived).toFixed(2));
+
+    document.getElementById("stmtBalanceAmt").innerText = "₹" + finalBalance;
+
+    const isZeroBalance = finalBalance <= 0;
+    const stampEl = document.getElementById("centerPaidStamp");
+    stampEl.dataset.isZero = isZeroBalance ? "true" : "false";
+
+    // Show toggle & center stamp ONLY when balance == 0
+    document.getElementById("previewStampToggleBox").style.display = isZeroBalance ? "flex" : "none";
+    stampEl.style.display = (isZeroBalance && printWithStamp) ? "block" : "none";
+
+    document.getElementById("editPanel").style.display = "none";
+    document.getElementById("invoiceSection").style.display = "block";
+    document.getElementById("invActions").style.display = "flex";
+  }
+
+  function previewCurrentInvoice() {
+    if (!selectedInv) return;
+    renderStatementInvoice(selectedInv, null);
+    setTimeout(() => {
+      downloadPDF();
+    }, 350);
   }
 
   function downloadPDF() {
@@ -770,9 +929,9 @@
     const statusEl = document.getElementById("editStatus");
     const btn = document.getElementById("btnSavePayment");
 
-    if (newPay < 0) {
+    if (newPay <= 0) {
       statusEl.style.color = "red";
-      statusEl.innerText = "Valid amount enter pannunga!";
+      statusEl.innerText = "Customer kodutha amount-a enter pannunga!";
       return;
     }
     if (newPay > selectedInv.balanceAmount) {
@@ -782,80 +941,27 @@
     }
 
     btn.disabled = true;
-    btn.innerText = "Saving & Downloading PDF...";
+    btn.innerText = "Saving & Downloading...";
     statusEl.innerText = "";
 
     try {
-      if (newPay > 0) {
-        await fetch(WEBAPP_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: "update_commercial_payment",
-            invoiceNo: selectedInv.invoiceNo,
-            newPayment: newPay
-          })
-        });
-      }
-
-      const totalAmt = selectedInv.totalAmount;
-      const totalReceived = +(selectedInv.receivedAmount + newPay).toFixed(2);
-      const finalBalance = Math.max(0, +(totalAmt - totalReceived).toFixed(2));
-
-      let parsedItems = [];
-      try {
-        parsedItems = JSON.parse(selectedInv.itemsJson || "[]");
-      } catch (e) {}
-
-      if (parsedItems.length === 0) {
-        parsedItems = [{ name: "Commercial Order (" + selectedInv.invoiceNo + ")", qty: 1, price: totalAmt, total: totalAmt }];
-      }
-
-      const cleanInv = selectedInv.invoiceNo.replace(/[\[\]]/g, "");
-      const safeCustomer = selectedInv.customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
-      currentPdfFilename = safeCustomer + "_" + cleanInv + ".pdf";
-
-      document.getElementById("invNo").innerText = selectedInv.invoiceNo;
-      document.getElementById("invDate").innerText = selectedInv.invoiceDate;
-      document.getElementById("invCustomer").innerText = selectedInv.customerName;
-
-      const tbody = document.getElementById("invProdBody");
-      tbody.innerHTML = "";
-      parsedItems.forEach((item, idx) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="col-sno">${idx + 1}</td>
-          <td class="col-name">${item.name}</td>
-          <td class="col-qtyprice">${item.qty} × ₹${item.price}</td>
-          <td class="col-total">₹${item.total}</td>
-        `;
-        tbody.appendChild(tr);
+      await fetch(WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "update_commercial_payment",
+          invoiceNo: selectedInv.invoiceNo,
+          newPayment: newPay
+        })
       });
 
-      const paidBox = document.getElementById("paidStampBox");
+      const now = new Date();
+      const dayDateStr = now.toLocaleDateString("en-GB", {
+        weekday: "short", day: "2-digit", month: "short", year: "numeric"
+      });
 
-      if (totalReceived > 0) {
-        document.getElementById("invSubTotalRow").style.display = "flex";
-        document.getElementById("invAdvanceRow").style.display = "flex";
-        document.getElementById("invSubTotal").innerText = "₹" + totalAmt;
-        document.getElementById("invAdvance").innerText = "₹" + totalReceived;
-        document.getElementById("invFinalLabel").innerText = "Balance to Pay";
-        document.getElementById("invGrandTotal").innerText = "₹" + finalBalance;
-
-        // Red PAID Stamp if Balance == 0
-        paidBox.style.display = finalBalance <= 0 ? "block" : "none";
-      } else {
-        document.getElementById("invSubTotalRow").style.display = "none";
-        document.getElementById("invAdvanceRow").style.display = "none";
-        document.getElementById("invFinalLabel").innerText = "Total Amount";
-        document.getElementById("invGrandTotal").innerText = "₹" + totalAmt;
-        paidBox.style.display = "none";
-      }
-
-      document.getElementById("editPanel").style.display = "none";
-      document.getElementById("invoiceSection").style.display = "block";
-      document.getElementById("invActions").style.display = "grid";
+      renderStatementInvoice(selectedInv, { date: dayDateStr, amount: newPay });
 
       setTimeout(() => {
         downloadPDF();
