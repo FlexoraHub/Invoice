@@ -207,36 +207,42 @@
       font-weight: 600;
     }
 
-    /* Invoice Styles */
-    #invoiceSection { display: none; max-width: 760px; margin: 0 auto; width: 100%; }
+    /* Invoice Styles - Original Compact Receipt Look */
+    #invoiceSection {
+      display: none;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 20px 24px 24px;
+    }
     .inv-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px dashed #cbd5e1;
-      padding-bottom: 14px;
-      margin-bottom: 18px;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
     }
     .inv-title {
-      font-size: 22px;
+      font-size: 19px;
       font-weight: 800;
       color: rgb(3, 64, 171);
       letter-spacing: 0.5px;
     }
     .inv-meta {
-      font-size: 14px;
+      font-size: 12.5px;
       color: #64748b;
       text-align: right;
     }
     .inv-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
+      margin-top: 6px;
     }
     .inv-table td {
-      padding: 13px 10px;
+      padding: 11px 6px;
       border-bottom: 1px solid #e2e8f0;
-      font-size: 15.5px;
+      font-size: 14px;
     }
     .inv-table td:first-child {
       color: #475569;
@@ -250,59 +256,78 @@
     .inv-total-row {
       background: #eef4ff;
       border-radius: 10px;
-      padding: 15px 20px;
-      margin-top: 18px;
+      padding: 14px 16px;
+      margin-top: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid #bfdbfe;
+      border: 1.5px solid #bfdbfe;
     }
     .inv-total-row span {
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 700;
       color: #1e3a8a;
     }
     .inv-total-row strong {
-      font-size: 24px;
+      font-size: 22px;
       color: rgb(3, 64, 171);
     }
     .inv-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      max-width: 760px;
+      gap: 12px;
+      max-width: 480px;
       width: 100%;
       margin: 0 auto;
-      padding: 0 28px 28px;
+      padding: 0 24px 24px;
     }
     .btn-print {
-      padding: 13px;
+      padding: 12px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
     }
     .btn-new {
-      padding: 13px;
+      padding: 12px;
       background: #e2e8f0;
       color: #1e293b;
       border: none;
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
     }
     .inv-footer {
       text-align: center;
-      font-size: 13.5px;
+      font-size: 12.5px;
       color: #64748b;
-      margin-top: 18px;
+      margin-top: 16px;
     }
 
-    /* Section 2: Stocks (Live Inventory View Only) */
+    /* PDF Capture Mode - Ensures full receipt prints cleanly without clipping */
+    .pdf-capturing {
+      max-width: 480px !important;
+      width: 480px !important;
+      min-height: auto !important;
+      height: auto !important;
+      margin: 0 auto !important;
+      border: none !important;
+    }
+    .pdf-capturing .banner-wrapper {
+      padding: 0 !important;
+      border-bottom: none !important;
+    }
+    .pdf-capturing .banner-img {
+      max-height: none !important;
+      width: 100% !important;
+      object-fit: cover !important;
+    }
+
+    /* Section 2: Stocks */
     #stockViewSection { display: none; }
     .stock-top-bar {
       display: flex;
@@ -395,7 +420,7 @@
       font-weight: 600;
     }
 
-    /* Section 3: Manage Stocks (Add & Update Forms Only) */
+    /* Section 3: Manage Stocks */
     #manageStockSection { display: none; }
     .stock-forms {
       display: grid;
@@ -445,7 +470,7 @@
 </head>
 <body>
 
-<div class="website-container">
+<div class="website-container" id="mainContainer">
   <div id="pdfContent" style="background: #ffffff; width: 100%; flex: 1; display: flex; flex-direction: column;">
     <div class="banner-wrapper">
       <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
@@ -559,11 +584,11 @@
     </div>
 
     <!-- INVOICE PREVIEW SECTION -->
-    <div class="content-area" id="invoiceSection">
+    <div id="invoiceSection">
       <div class="inv-header">
         <div class="inv-title">INVOICE</div>
         <div class="inv-meta">
-          <div id="invNo" style="font-weight: 700; color: #0f172a; font-size: 16px;">[RRS-154]</div>
+          <div id="invNo" style="font-weight: 700; color: #0f172a; font-size: 14px;">[RRS-154]</div>
           <div id="invDate"></div>
         </div>
       </div>
@@ -603,7 +628,7 @@
       <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
     </div>
 
-    <!-- SECTION 2: STOCKS (Live Stock Inventory Only) -->
+    <!-- SECTION 2: STOCKS -->
     <div class="content-area" id="stockViewSection">
       <div class="stock-top-bar">
         <h2 style="border:none; margin:0; padding:0;">Live Stock Inventory</h2>
@@ -615,7 +640,7 @@
       </div>
     </div>
 
-    <!-- SECTION 3: MANAGE STOCKS (Add & Update Forms Only) -->
+    <!-- SECTION 3: MANAGE STOCKS -->
     <div class="content-area" id="manageStockSection">
       <h2>Manage Stocks</h2>
 
@@ -828,17 +853,25 @@
   }
 
   function downloadPDF() {
-    document.getElementById("navTabs").style.display = "none";
+    const navTabs = document.getElementById("navTabs");
+    const container = document.getElementById("mainContainer");
     const element = document.getElementById("pdfContent");
+
+    // Temporarily switch to compact receipt width & auto-height so full invoice captures cleanly
+    navTabs.style.display = "none";
+    container.classList.add("pdf-capturing");
+
     const opt = {
       margin:       10,
       filename:     currentPdfFilename,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
+      html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
+
     html2pdf().set(opt).from(element).save().then(() => {
-      document.getElementById("navTabs").style.display = "flex";
+      container.classList.remove("pdf-capturing");
+      navTabs.style.display = "flex";
     });
   }
 
