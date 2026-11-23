@@ -419,22 +419,54 @@
     .col-date { text-align: center; color: #475569 !important; font-weight: 600; }
     .col-amt  { text-align: right; font-weight: 700; }
 
-    /* Center Square PAID Stamp Overlay (Matches Image 1) */
+    /* Pure HTML/CSS Square Double-Border PAID Stamp (100% html2canvas PDF compatible) */
     .center-paid-stamp {
       display: none;
       position: absolute;
       top: 56%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(-10deg);
-      width: 134px;
-      height: 134px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 4px solid #d90404;
+      border-radius: 16px;
+      padding: 4px;
       pointer-events: none;
       z-index: 10;
     }
-    .center-paid-stamp svg {
-      width: 100%;
-      height: 100%;
-      display: block;
+    .stamp-inner-box {
+      border: 2px solid #d90404;
+      border-radius: 10px;
+      padding: 10px 18px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .stamp-circle {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #d90404;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 5px;
+    }
+    .stamp-check {
+      width: 11px;
+      height: 20px;
+      border: solid #d90404;
+      border-width: 0 4.5px 4.5px 0;
+      transform: rotate(45deg);
+      margin-bottom: 3px;
+    }
+    .stamp-word {
+      color: #d90404;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 26px;
+      letter-spacing: 2px;
+      line-height: 1;
     }
 
     .stmt-balance-box {
@@ -657,22 +689,14 @@
           <tbody id="stmtBody"></tbody>
         </table>
 
-        <!-- Rounded Square Double-Border PAID Stamp with Circle Checkmark -->
+        <!-- Pure HTML/CSS Square Double-Border PAID Stamp (Renders cleanly in PDF) -->
         <div class="center-paid-stamp" id="centerPaidStamp">
-          <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-            <!-- Soft white translucent backing -->
-            <rect x="6" y="6" width="168" height="168" rx="22" fill="rgba(255, 255, 255, 0.86)" />
-            <!-- Outer thick red rounded border -->
-            <rect x="12" y="12" width="156" height="156" rx="18" fill="none" stroke="#d90404" stroke-width="6.5" />
-            <!-- Inner thin red rounded border -->
-            <rect x="22" y="22" width="136" height="136" rx="12" fill="none" stroke="#d90404" stroke-width="2.5" />
-            <!-- Circle around checkmark -->
-            <circle cx="90" cy="68" r="28" fill="none" stroke="#d90404" stroke-width="5.5" />
-            <!-- Bold checkmark -->
-            <path d="M76 68 L86 78 L106 57" fill="none" stroke="#d90404" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" />
-            <!-- Bold PAID text -->
-            <text x="90" y="138" text-anchor="middle" fill="#d90404" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="36" letter-spacing="2">PAID</text>
-          </svg>
+          <div class="stamp-inner-box">
+            <div class="stamp-circle">
+              <div class="stamp-check"></div>
+            </div>
+            <div class="stamp-word">PAID</div>
+          </div>
         </div>
       </div>
 
@@ -865,7 +889,6 @@
     const tbody = document.getElementById("stmtBody");
     tbody.innerHTML = "";
 
-    // Row 1: Invoice Amount
     const trInv = document.createElement("tr");
     trInv.innerHTML = `
       <td class="col-desc">Invoice Amount (${invObj.invoiceNo})</td>
@@ -874,7 +897,6 @@
     `;
     tbody.appendChild(trInv);
 
-    // Row 2: Advance (Only if Advance > 0)
     if (invObj.advanceAmount > 0) {
       const trAdv = document.createElement("tr");
       trAdv.innerHTML = `
@@ -885,7 +907,6 @@
       tbody.appendChild(trAdv);
     }
 
-    // Subsequent Rows: Amount 1, Amount 2, Amount 3...
     const historyList = parseHistoryEntries(invObj.historyRaw);
     if (extraPaymentObj && extraPaymentObj.amount > 0) {
       historyList.push({ date: formatCleanDayDate(extraPaymentObj.date), amount: extraPaymentObj.amount });
