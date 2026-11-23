@@ -192,7 +192,6 @@
       color: #ffffff;
     }
 
-    /* Show + Add button only on the last product row */
     .product-row:not(:last-child) .btn-add-inline {
       display: none;
     }
@@ -225,7 +224,6 @@
       color: rgb(3, 64, 171);
     }
 
-    /* Optional Advance Input Box in the Middle */
     .advance-box {
       background: #f8fafc;
       border: 1.5px solid #cbd5e1;
@@ -355,7 +353,6 @@
     .col-qtyprice { text-align: right; color: #334155 !important; font-weight: 600; }
     .col-total { text-align: right; font-weight: 700; }
 
-    /* Invoice Totals & Advance Breakdown */
     .inv-summary-block {
       margin-top: 18px;
       display: flex;
@@ -498,7 +495,6 @@
           <div>Final Grand Total<strong id="dispGrandTotal">₹0</strong></div>
         </div>
 
-        <!-- Optional Advance Amount Input -->
         <div class="advance-box">
           <label for="advanceAmount">Advance Amount (₹) <span style="font-weight:400;color:#64748b;">(Optional)</span></label>
           <input type="number" id="advanceAmount" min="0" step="0.01" placeholder="0" />
@@ -539,20 +535,17 @@
         <tbody id="invProdBody"></tbody>
       </table>
 
-      <!-- Totals & Advance Breakdown -->
       <div class="inv-summary-block">
-        <!-- Shown ONLY when Advance Amount > 0 -->
         <div class="inv-sub-row" id="invSubTotalRow" style="display: none;">
           <span>Total Amount</span>
           <strong id="invSubTotal">₹0</strong>
         </div>
 
         <div class="inv-sub-row" id="invAdvanceRow" style="display: none;">
-          <span>Advance Amount</span>
-          <strong id="invAdvance" style="color: #059669;">- ₹0</strong>
+          <span>Advance Received from Customer</span>
+          <strong id="invAdvance" style="color: #059669;">₹0</strong>
         </div>
 
-        <!-- Main Highlight Row: Shows "Total Amount" normally, or "Balance to Pay" if Advance is paid -->
         <div class="inv-total-row">
           <span id="invFinalLabel">Total Amount</span>
           <strong id="invGrandTotal">₹0</strong>
@@ -734,7 +727,9 @@
           action: "save_commercial_bill",
           invoiceNo: "[" + invCode + "]",
           customerName: customerName,
-          grandTotal: grandTotal
+          grandTotal: grandTotal,
+          advanceAmount: advanceVal,
+          items: items
         })
       });
 
@@ -760,7 +755,6 @@
         tbody.appendChild(tr);
       });
 
-      // Handle Advance & Balance to Pay display in Invoice
       if (advanceVal > 0) {
         const balanceToPay = +(grandTotal - advanceVal).toFixed(2);
         document.getElementById("invSubTotalRow").style.display = "flex";
