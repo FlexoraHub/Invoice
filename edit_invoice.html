@@ -394,7 +394,6 @@
 
     .stmt-table-wrapper {
       position: relative;
-      min-height: 150px;
     }
     .stmt-table {
       width: 100%;
@@ -419,54 +418,23 @@
     .col-date { text-align: center; color: #475569 !important; font-weight: 600; }
     .col-amt  { text-align: right; font-weight: 700; }
 
-    /* Pure HTML/CSS Square Double-Border PAID Stamp (100% html2canvas PDF compatible) */
+    /* Center PAID Stamp Overlay */
     .center-paid-stamp {
       display: none;
       position: absolute;
-      top: 56%;
+      top: 52%;
       left: 50%;
-      transform: translate(-50%, -50%) rotate(-10deg);
-      background: rgba(255, 255, 255, 0.88);
-      border: 4px solid #d90404;
-      border-radius: 16px;
-      padding: 4px;
-      pointer-events: none;
-      z-index: 10;
-    }
-    .stamp-inner-box {
-      border: 2px solid #d90404;
-      border-radius: 10px;
-      padding: 10px 18px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .stamp-circle {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #d90404;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 5px;
-    }
-    .stamp-check {
-      width: 11px;
-      height: 20px;
-      border: solid #d90404;
-      border-width: 0 4.5px 4.5px 0;
-      transform: rotate(45deg);
-      margin-bottom: 3px;
-    }
-    .stamp-word {
-      color: #d90404;
-      font-family: Arial, Helvetica, sans-serif;
+      transform: translate(-50%, -50%) rotate(-12deg);
+      border: 4px solid rgba(220, 38, 38, 0.85);
+      color: rgba(220, 38, 38, 0.85);
+      font-size: 38px;
       font-weight: 900;
-      font-size: 26px;
-      letter-spacing: 2px;
-      line-height: 1;
+      letter-spacing: 6px;
+      padding: 8px 34px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.72);
     }
 
     .stmt-balance-box {
@@ -689,15 +657,7 @@
           <tbody id="stmtBody"></tbody>
         </table>
 
-        <!-- Pure HTML/CSS Square Double-Border PAID Stamp (Renders cleanly in PDF) -->
-        <div class="center-paid-stamp" id="centerPaidStamp">
-          <div class="stamp-inner-box">
-            <div class="stamp-circle">
-              <div class="stamp-check"></div>
-            </div>
-            <div class="stamp-word">PAID</div>
-          </div>
-        </div>
+        <div class="center-paid-stamp" id="centerPaidStamp">PAID</div>
       </div>
 
       <div class="stmt-balance-box">
@@ -734,24 +694,17 @@
   let currentPdfFilename = "Invoice.pdf";
   let printWithStamp = true;
 
+  // Strips "00:00:00 GMT+0530 (India Standard Time)" and returns clean "Mon - 23 Nov 2026"
   function formatCleanDayDate(rawVal) {
     if (!rawVal) return "-";
     const str = String(rawVal).trim();
-    const m = str.match(/^([A-Za-z]{3}),?\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/);
-    if (m) {
-      return `${m[1]} - ${m[3].padStart(2, "0")} ${m[2]} ${m[4]}`;
-    }
-    const m2 = str.match(/^([A-Za-z]{3}),?\s+(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/);
-    if (m2) {
-      return `${m2[1]} - ${m2[2].padStart(2, "0")} ${m2[3]} ${m2[4]}`;
-    }
     const parsed = new Date(str);
     if (!isNaN(parsed.getTime())) {
       const weekday = parsed.toLocaleDateString("en-GB", { weekday: "short" });
       const datePart = parsed.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
       return `${weekday} - ${datePart}`;
     }
-    return str.replace(/\s*\d{2}:\d{2}:\d{2}.*$/, "");
+    return str.replace(/\s*\d{2}:\d{2}:\d{2}.*$/, "").replace(",", " -");
   }
 
   function syncStampToggle(isChecked) {
@@ -889,6 +842,7 @@
     const tbody = document.getElementById("stmtBody");
     tbody.innerHTML = "";
 
+    // Row 1: Invoice Amount
     const trInv = document.createElement("tr");
     trInv.innerHTML = `
       <td class="col-desc">Invoice Amount (${invObj.invoiceNo})</td>
@@ -897,6 +851,7 @@
     `;
     tbody.appendChild(trInv);
 
+    // Row 2: Advance (Only if Advance > 0)
     if (invObj.advanceAmount > 0) {
       const trAdv = document.createElement("tr");
       trAdv.innerHTML = `
@@ -907,6 +862,7 @@
       tbody.appendChild(trAdv);
     }
 
+    // Subsequent Rows: Amount 1, Amount 2, Amount 3...
     const historyList = parseHistoryEntries(invObj.historyRaw);
     if (extraPaymentObj && extraPaymentObj.amount > 0) {
       historyList.push({ date: formatCleanDayDate(extraPaymentObj.date), amount: extraPaymentObj.amount });
