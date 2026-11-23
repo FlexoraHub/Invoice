@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RRS FlexoraHub - Printer Billing & Invoice</title>
-  <!-- Direct PDF Generation Library -->
+  <title>RRS FlexoraHub - Printer Billing & Stock System</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -18,7 +17,6 @@
       justify-content: center;
     }
 
-    /* Second Image-la irukkura maari clean scaling + normal subtle outline */
     .website-container {
       background: #ffffff;
       width: 100%;
@@ -41,10 +39,45 @@
     }
     .banner-img {
       width: 100%;
-      max-height: 145px;
+      max-height: 140px;
       object-fit: contain;
       display: block;
     }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      background: #f8fafc;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding: 0 28px;
+      gap: 12px;
+    }
+    .nav-tab {
+      padding: 13px 22px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #475569;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-tab.active {
+      color: rgb(3, 64, 171);
+      border-bottom-color: rgb(3, 64, 171);
+      background: #ffffff;
+    }
+    .low-badge {
+      background: #dc2626;
+      color: #fff;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 99px;
+      margin-left: 6px;
+      display: none;
+    }
+
     .content-area {
       width: 100%;
       padding: 18px 28px 24px;
@@ -62,11 +95,11 @@
       padding-bottom: 10px;
     }
 
-    /* 3 Columns per Row - Second Image exact proportion */
+    /* 3 Columns per Row */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 18px 24px;
+      gap: 16px 24px;
     }
     label {
       display: block;
@@ -117,10 +150,10 @@
       gap: 10px;
     }
 
-    /* Bottom Bar: Amount Bottom-Left & Save Button Bottom-Right */
+    /* Bottom Bar */
     .bottom-bar {
       margin-top: auto;
-      padding-top: 24px;
+      padding-top: 22px;
       display: flex;
       justify-content: space-between;
       align-items: stretch;
@@ -269,15 +302,116 @@
       margin-top: 18px;
     }
 
-    /* Responsive */
+    /* Stock Management Section */
+    #stockSection { display: none; }
+    .stock-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .refresh-btn {
+      padding: 8px 16px;
+      background: #eef4ff;
+      color: rgb(3, 64, 171);
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .stock-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stock-card {
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 14px 16px;
+      background: #f8fafc;
+    }
+    .stock-card.low {
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+    .stock-cat {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+    .stock-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 4px 0 8px;
+    }
+    .stock-qty {
+      font-size: 22px;
+      font-weight: 800;
+      color: rgb(3, 64, 171);
+    }
+    .stock-card.low .stock-qty { color: #dc2626; }
+    .stock-alert-tag {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #dc2626;
+    }
+    .empty-stock-msg {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 10px;
+      color: #475569;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .stock-forms {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      border-top: 1.5px solid #e2e8f0;
+      padding-top: 20px;
+    }
+    .stock-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 16px 20px;
+      background: #ffffff;
+    }
+    .stock-box h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: rgb(3, 64, 171);
+    }
+    .stock-box .field { margin-bottom: 12px; }
+    .btn-stock-save {
+      width: 100%;
+      padding: 12px;
+      background: rgb(3, 64, 171);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-stock-save:disabled { background: #94a3b8; cursor: not-allowed; }
+
     @media (max-width: 900px) {
-      .form-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid, .stock-cards, .stock-forms { grid-template-columns: 1fr 1fr; }
       .bottom-bar { flex-direction: column; }
       .summary-box { justify-content: space-around; gap: 12px; }
       .action-right { width: 100%; }
     }
     @media (max-width: 600px) {
-      .form-grid { grid-template-columns: 1fr; }
+      .form-grid, .stock-cards, .stock-forms { grid-template-columns: 1fr; }
       .content-area { padding: 16px; }
       .inv-actions { padding: 0 16px 20px; }
     }
@@ -286,13 +420,20 @@
 <body>
 
 <div class="website-container">
-  <!-- PDF-la capture aagura area (Banner + Invoice Body) -->
   <div id="pdfContent" style="background: #ffffff; width: 100%; flex: 1; display: flex; flex-direction: column;">
     <div class="banner-wrapper">
       <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
     </div>
 
-    <!-- FORM SECTION -->
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs" id="navTabs">
+      <button type="button" class="nav-tab active" id="tabBilling" onclick="switchTab('billing')">Printer Billing & Invoice</button>
+      <button type="button" class="nav-tab" id="tabStock" onclick="switchTab('stock')">
+        Stock Management <span class="low-badge" id="lowStockBadge">0 Low</span>
+      </button>
+    </div>
+
+    <!-- BILLING FORM SECTION -->
     <div class="content-area" id="formSection">
       <h2>Printer Job Entry</h2>
 
@@ -357,6 +498,14 @@
           <input type="number" id="manualTotal" step="0.01" min="0" placeholder="e.g. 40" oninput="calculate()" />
         </div>
 
+        <div>
+          <label>Deduct From Stock Item</label>
+          <select id="paperStockSelect">
+            <option value="None">Don't Deduct Stock</option>
+          </select>
+        </div>
+
+        <!-- Row 4: Spiral Details -->
         <div id="spiralBox" style="display:none;">
           <div class="spiral-inline">
             <div>
@@ -431,6 +580,79 @@
 
       <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
     </div>
+
+    <!-- STOCK MANAGEMENT SECTION -->
+    <div class="content-area" id="stockSection">
+      <div class="stock-top-bar">
+        <h2 style="border:none; margin:0; padding:0;">Live Stock Inventory</h2>
+        <button type="button" class="refresh-btn" onclick="loadStock()">↻ Refresh Stock</button>
+      </div>
+
+      <div class="stock-cards" id="stockCardsGrid">
+        <div style="color:#64748b; font-size:14px;">Loading stock from Google Sheet...</div>
+      </div>
+
+      <div class="stock-forms">
+        <!-- Add Brand New Stock Item (Manual Entry First) -->
+        <div class="stock-box">
+          <h3>+ Add New Stock Item</h3>
+          <div class="field">
+            <label>Item Name</label>
+            <input type="text" id="newItemName" placeholder="e.g. A4 Paper 75 GSM / Spiral Coil" />
+          </div>
+          <div class="spiral-inline field">
+            <div>
+              <label>Category</label>
+              <input type="text" id="newItemCat" placeholder="e.g. Paper / Binding / Ink" />
+            </div>
+            <div>
+              <label>Unit</label>
+              <input type="text" id="newItemUnit" placeholder="e.g. Sheets / Coils / Nos" />
+            </div>
+          </div>
+          <div class="spiral-inline field">
+            <div>
+              <label>Opening Stock Qty</label>
+              <input type="number" id="newItemQty" min="0" placeholder="e.g. 500" />
+            </div>
+            <div>
+              <label>Low Alert Limit</label>
+              <input type="number" id="newItemLimit" min="0" placeholder="e.g. 100" />
+            </div>
+          </div>
+          <button type="button" class="btn-stock-save" id="btnNewItem" onclick="submitNewItem()">+ Add Item to Stock</button>
+          <div id="newItemStatus" style="margin-top:8px; font-size:13px; font-weight:600; text-align:center;"></div>
+        </div>
+
+        <!-- Update Existing Stock -->
+        <div class="stock-box">
+          <h3>Update Existing Stock (+ / -)</h3>
+          <div class="field">
+            <label>Select Item</label>
+            <select id="stockItemSelect">
+              <option value="">-- Add an item first --</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Action</label>
+            <div class="toggle-group">
+              <button type="button" class="toggle-btn active" id="btnStockAdd" onclick="setStockMode('add')">+ Add Stock</button>
+              <button type="button" class="toggle-btn" id="btnStockDeduct" onclick="setStockMode('deduct')">- Deduct Stock</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Quantity</label>
+            <input type="number" id="stockUpdateQty" min="1" placeholder="e.g. 500" />
+          </div>
+          <div class="field">
+            <label>Note / Reference (Optional)</label>
+            <input type="text" id="stockUpdateNote" placeholder="e.g. Bought 1 Bundle" />
+          </div>
+          <button type="button" class="btn-stock-save" id="btnUpdateStock" onclick="submitStockUpdate()">Update Stock</button>
+          <div id="stockStatus" style="margin-top:8px; font-size:13px; font-weight:600; text-align:center;"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Action Buttons (PDF-la varaadhu) -->
@@ -441,15 +663,16 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_Rqv5J_psAZw45CKIWQXBDWa-uancPp8gaoIVKTZbc9viMDcx90wB3HJYHeT4tvLsLQ/exec";
+  const OLD_PRINTER_SHEET_URL = "https://script.google.com/macros/s/AKfycbx_Rqv5J_psAZw45CKIWQXBDWa-uancPp8gaoIVKTZbc9viMDcx90wB3HJYHeT4tvLsLQ/exec";
+  const NEW_STOCK_BILLING_URL = "https://script.google.com/macros/s/AKfycbz4j7HZ71_STCQsKmZZWhnrVFhkENWNeHzfmM7Q4DbPAyPKYCogeENa7wvl6H8z8BNu/exec";
 
   let printColor = "bw";
   let printSide = "single";
   let spiralOption = "without";
   let amountMode = "auto";
+  let stockMode = "add";
   let currentPdfFilename = "Invoice.pdf";
 
-  // Populate Spiral Dropdown (1 to 50)
   const spiralSelect = document.getElementById("spiralQty");
   for (let i = 1; i <= 50; i++) {
     const opt = document.createElement("option");
@@ -458,7 +681,23 @@
     spiralSelect.appendChild(opt);
   }
 
-  // Series Invoice Number Generator starting from [RRS-154]
+  function switchTab(tab) {
+    document.getElementById("tabBilling").classList.toggle("active", tab === "billing");
+    document.getElementById("tabStock").classList.toggle("active", tab === "stock");
+
+    document.getElementById("invoiceSection").style.display = "none";
+    document.getElementById("invActions").style.display = "none";
+
+    if (tab === "billing") {
+      document.getElementById("formSection").style.display = "flex";
+      document.getElementById("stockSection").style.display = "none";
+    } else {
+      document.getElementById("formSection").style.display = "none";
+      document.getElementById("stockSection").style.display = "flex";
+      loadStock();
+    }
+  }
+
   function getNextInvoiceNumber() {
     let lastNum = parseInt(localStorage.getItem("rrs_custom_series") || "153", 10);
     let nextNum = lastNum + 1;
@@ -515,6 +754,12 @@
     calculate();
   }
 
+  function setStockMode(mode) {
+    stockMode = mode;
+    document.getElementById("btnStockAdd").classList.toggle("active", mode === "add");
+    document.getElementById("btnStockDeduct").classList.toggle("active", mode === "deduct");
+  }
+
   function calculate() {
     const pages = parseInt(document.getElementById("numPages").value) || 0;
     const paperQty = printSide === "single" ? pages : Math.ceil(pages / 2);
@@ -553,6 +798,7 @@
   }
 
   function downloadPDF() {
+    document.getElementById("navTabs").style.display = "none";
     const element = document.getElementById("pdfContent");
     const opt = {
       margin:       10,
@@ -561,12 +807,15 @@
       html2canvas:  { scale: 2, useCORS: true },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(element).save();
+    html2pdf().set(opt).from(element).save().then(() => {
+      document.getElementById("navTabs").style.display = "flex";
+    });
   }
 
   async function saveJob() {
     const customerName = document.getElementById("customerName").value.trim();
     const rawJobName = document.getElementById("jobPurpose").value.trim();
+    const paperItem = document.getElementById("paperStockSelect").value;
     const { pages, paperQty, amtPerPage, printAmount, spiralQty, spiralRate, spiralAmount, totalAmount } = calculate();
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("saveBtn");
@@ -589,13 +838,14 @@
 
     const colorText = printColor === "bw" ? "Black & White" : "Color";
     const sideText = printSide === "single" ? "Single Side" : "Front & Back";
+    const invCode = getNextInvoiceNumber();
 
     btn.disabled = true;
-    btn.innerText = "Saving & Downloading PDF...";
+    btn.innerText = "Updating Sheets & Downloading PDF...";
     statusEl.innerText = "";
 
     try {
-      await fetch(SCRIPT_URL, {
+      const oldSheetReq = fetch(OLD_PRINTER_SHEET_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -607,9 +857,31 @@
         })
       });
 
+      const newSheetReq = fetch(NEW_STOCK_BILLING_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "save_bill",
+          invoiceNo: "[" + invCode + "]",
+          customerName: customerName,
+          jobName: rawJobName,
+          pages: pages,
+          paperQty: paperQty,
+          paperItem: paperItem === "None" ? "" : paperItem,
+          color: colorText,
+          side: sideText,
+          spiralQty: spiralQty,
+          printAmount: printAmount,
+          spiralAmount: spiralAmount,
+          grandTotal: totalAmount
+        })
+      });
+
+      await Promise.all([oldSheetReq, newSheetReq]);
+
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-      const invCode = getNextInvoiceNumber();
       const safeCustomer = customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
       currentPdfFilename = safeCustomer + "_" + invCode + ".pdf";
 
@@ -636,7 +908,8 @@
 
       setTimeout(() => {
         downloadPDF();
-      }, 300);
+        loadStock();
+      }, 350);
 
     } catch (err) {
       statusEl.style.color = "red";
@@ -658,11 +931,176 @@
     calculate();
     document.getElementById("invoiceSection").style.display = "none";
     document.getElementById("invActions").style.display = "none";
-    document.getElementById("formSection").style.display = "block";
+    document.getElementById("formSection").style.display = "flex";
+  }
+
+  // Load only manually added stock items from Google Sheet
+  async function loadStock() {
+    const grid = document.getElementById("stockCardsGrid");
+    const select = document.getElementById("stockItemSelect");
+    const paperSelect = document.getElementById("paperStockSelect");
+    const badge = document.getElementById("lowStockBadge");
+
+    try {
+      const res = await fetch(NEW_STOCK_BILLING_URL);
+      const data = await res.json();
+
+      if (data.status === "success" && Array.isArray(data.stock)) {
+        grid.innerHTML = "";
+        select.innerHTML = "";
+        let lowCount = 0;
+
+        const currentPaperVal = paperSelect.value;
+        paperSelect.innerHTML = "";
+
+        if (data.stock.length === 0) {
+          grid.innerHTML = `<div class="empty-stock-msg">No stock items added yet. Use "+ Add New Stock Item" below or add directly in your Google Sheet!</div>`;
+          select.innerHTML = `<option value="">-- No items in stock --</option>`;
+        } else {
+          data.stock.forEach(item => {
+            const isLow = item.qty <= item.alertLimit;
+            if (isLow) lowCount++;
+
+            const card = document.createElement("div");
+            card.className = "stock-card" + (isLow ? " low" : "");
+            card.innerHTML = `
+              <div class="stock-cat">${item.category}</div>
+              <div class="stock-name">${item.name}</div>
+              <div class="stock-qty">${item.qty} <span style="font-size:13px;font-weight:600;">${item.unit}</span></div>
+              ${isLow ? `<div class="stock-alert-tag">⚠ Low Stock (Limit: ${item.alertLimit})</div>` : ""}
+            `;
+            grid.appendChild(card);
+
+            const opt = document.createElement("option");
+            opt.value = item.name;
+            opt.text = `${item.name} (${item.qty} ${item.unit})`;
+            select.appendChild(opt);
+
+            // Ella manual stock items-ayum Billing dropdown-la kaattum (neenga edha vendumnaalum select panni deduct pannikalam)
+            const pOpt = document.createElement("option");
+            pOpt.value = item.name;
+            pOpt.text = `${item.name} (${item.qty} ${item.unit} left)`;
+            paperSelect.appendChild(pOpt);
+          });
+        }
+
+        const noneOpt = document.createElement("option");
+        noneOpt.value = "None";
+        noneOpt.text = "Don't Deduct Stock";
+        paperSelect.appendChild(noneOpt);
+        if (currentPaperVal) paperSelect.value = currentPaperVal;
+
+        if (lowCount > 0) {
+          badge.style.display = "inline-block";
+          badge.innerText = lowCount + " Low";
+        } else {
+          badge.style.display = "none";
+        }
+      }
+    } catch (err) {
+      grid.innerHTML = `<div style="color:red; font-size:13px;">Stock load error: ${err.message}</div>`;
+    }
+  }
+
+  async function submitStockUpdate() {
+    const itemName = document.getElementById("stockItemSelect").value;
+    const qty = parseInt(document.getElementById("stockUpdateQty").value) || 0;
+    const note = document.getElementById("stockUpdateNote").value.trim();
+    const statusEl = document.getElementById("stockStatus");
+    const btn = document.getElementById("btnUpdateStock");
+
+    if (!itemName || qty <= 0) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Item & valid Quantity enter pannunga!";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Updating...";
+    statusEl.innerText = "";
+
+    try {
+      await fetch(NEW_STOCK_BILLING_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "update_stock",
+          itemName: itemName,
+          mode: stockMode,
+          qty: qty,
+          note: note || (stockMode === "add" ? "Stock Added" : "Manual Deduction")
+        })
+      });
+
+      statusEl.style.color = "green";
+      statusEl.innerText = "Stock Updated!";
+      document.getElementById("stockUpdateQty").value = "";
+      document.getElementById("stockUpdateNote").value = "";
+      setTimeout(loadStock, 800);
+    } catch (err) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Error: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Update Stock";
+    }
+  }
+
+  async function submitNewItem() {
+    const itemName = document.getElementById("newItemName").value.trim();
+    const category = document.getElementById("newItemCat").value.trim();
+    const unit = document.getElementById("newItemUnit").value.trim();
+    const qty = parseInt(document.getElementById("newItemQty").value) || 0;
+    const alertLimit = parseInt(document.getElementById("newItemLimit").value) || 10;
+    const statusEl = document.getElementById("newItemStatus");
+    const btn = document.getElementById("btnNewItem");
+
+    if (!itemName) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Item Name enter pannunga!";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Adding Item...";
+    statusEl.innerText = "";
+
+    try {
+      await fetch(NEW_STOCK_BILLING_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "add_new_item",
+          itemName: itemName,
+          category: category || "General",
+          unit: unit || "Nos",
+          qty: qty,
+          alertLimit: alertLimit
+        })
+      });
+
+      statusEl.style.color = "green";
+      statusEl.innerText = "New Item Added!";
+      document.getElementById("newItemName").value = "";
+      document.getElementById("newItemCat").value = "";
+      document.getElementById("newItemUnit").value = "";
+      document.getElementById("newItemQty").value = "";
+      document.getElementById("newItemLimit").value = "";
+      setTimeout(loadStock, 800);
+    } catch (err) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Error: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "+ Add Item to Stock";
+    }
   }
 
   // Initial load
   document.getElementById("autoRate").value = getSavedRate("bw", "single");
+  loadStock();
 </script>
 
 </body>
