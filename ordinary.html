@@ -115,30 +115,12 @@
     }
 
     .products-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       margin-bottom: 12px;
     }
     .products-header h3 {
       margin: 0;
       font-size: 16px;
       color: rgb(3, 64, 171);
-    }
-    .btn-add-product {
-      padding: 9px 18px;
-      background: #eef4ff;
-      color: rgb(3, 64, 171);
-      border: 1.5px solid #bfdbfe;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-add-product:hover {
-      background: rgb(3, 64, 171);
-      color: #ffffff;
     }
 
     .product-list {
@@ -148,7 +130,7 @@
     }
     .product-row {
       display: grid;
-      grid-template-columns: 2.2fr 1fr 1fr 1.1fr 42px;
+      grid-template-columns: 2.2fr 0.9fr 1fr 1.1fr auto;
       gap: 14px;
       align-items: end;
       background: #f8fafc;
@@ -170,6 +152,12 @@
       align-items: center;
       justify-content: flex-end;
     }
+
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .btn-remove-row {
       height: 44px;
       width: 42px;
@@ -180,10 +168,33 @@
       font-size: 18px;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.2s;
     }
     .btn-remove-row:hover {
       background: #dc2626;
       color: #ffffff;
+    }
+    .btn-add-inline {
+      height: 44px;
+      padding: 0 14px;
+      background: #eef4ff;
+      color: rgb(3, 64, 171);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-add-inline:hover {
+      background: rgb(3, 64, 171);
+      color: #ffffff;
+    }
+
+    /* Show + Add button only on the last product row */
+    .product-row:not(:last-child) .btn-add-inline {
+      display: none;
     }
 
     /* Bottom Bar */
@@ -429,7 +440,6 @@
 
       <div class="products-header">
         <h3>Products List</h3>
-        <button type="button" class="btn-add-product" onclick="addProductRow()">+ Add Product</button>
       </div>
 
       <div class="product-list" id="productList"></div>
@@ -497,7 +507,6 @@
   let rowCounter = 0;
   let currentPdfFilename = "Invoice.pdf";
 
-  // Sync highest series number across both Billing & Commercial_Billing tabs
   async function syncInvoiceSeries() {
     try {
       const res = await fetch(WEBAPP_URL);
@@ -542,8 +551,9 @@
         <label>Total Value</label>
         <div class="row-total-box">₹0</div>
       </div>
-      <div>
+      <div class="row-actions">
         <button type="button" class="btn-remove-row" title="Remove Product" onclick="removeProductRow('prodRow_${rowCounter}')">×</button>
+        <button type="button" class="btn-add-inline" onclick="addProductRow()">+ Add Product</button>
       </div>
     `;
 
