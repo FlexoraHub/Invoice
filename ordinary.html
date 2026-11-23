@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RRS FlexoraHub - Ordinary Billing & Invoice</title>
+  <title>RRS FlexoraHub - Commercial Billing & Invoice</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -235,6 +235,7 @@
       transition: background 0.2s;
     }
     .save-btn:hover { background: #022d7a; }
+    .save-btn:disabled { background: #94a3b8; cursor: not-allowed; }
     #status {
       margin-top: 6px;
       text-align: right;
@@ -375,7 +376,7 @@
       cursor: pointer;
     }
 
-    /* PDF Capture Mode - Exact Full-Sheet A5 Invoice Layout */
+    /* PDF Capture Mode */
     .pdf-capturing {
       max-width: 680px !important;
       width: 680px !important;
@@ -407,7 +408,6 @@
 <body>
 
 <div class="website-container" id="mainContainer">
-  <!-- PDF-la capture aagura area -->
   <div id="pdfContent" style="background: #ffffff; width: 100%; flex: 1; display: flex; flex-direction: column;">
     <div class="banner-wrapper">
       <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
@@ -415,7 +415,7 @@
 
     <div class="top-nav" id="topNav">
       <a href="index.html" class="home-btn">← Home</a>
-      <div class="page-tag">Ordinary Billing & Products Invoice</div>
+      <div class="page-tag">Commercial Billing & Products Invoice</div>
     </div>
 
     <!-- FORM SECTION -->
@@ -441,7 +441,7 @@
         </div>
 
         <div class="action-right">
-          <button type="button" class="save-btn" id="generateBtn" onclick="generateInvoice()">Generate & Download Invoice</button>
+          <button type="button" class="save-btn" id="generateBtn" onclick="generateInvoice()">Save & Download Invoice</button>
           <div id="status"></div>
         </div>
       </div>
@@ -449,22 +449,19 @@
 
     <!-- INVOICE TEMPLATE SECTION -->
     <div id="invoiceSection">
-      <!-- Header -->
       <div class="inv-header">
         <div class="inv-title">INVOICE</div>
         <div class="inv-meta">
-          <div id="invNo" style="font-weight: 700; color: #0f172a; font-size: 14px;">[RRS-154]</div>
+          <div id="invNo" style="font-weight: 700; color: #0f172a; font-size: 14px;">[RRS-175]</div>
           <div id="invDate"></div>
         </div>
       </div>
 
-      <!-- Single Line Customer Name -->
       <div class="inv-customer-line">
         <span>Name of the Customer</span>
         <strong id="invCustomer">-</strong>
       </div>
 
-      <!-- List of Products Table -->
       <div class="inv-section-heading">List of Products</div>
       <table class="inv-prod-table">
         <thead>
@@ -478,18 +475,16 @@
         <tbody id="invProdBody"></tbody>
       </table>
 
-      <!-- Grand Total -->
       <div class="inv-total-row">
         <span>Total Amount</span>
         <strong id="invGrandTotal">₹0</strong>
       </div>
 
-      <!-- Footer -->
       <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
     </div>
   </div>
 
-  <!-- Action Buttons (PDF-la varaadhu) -->
+  <!-- Action Buttons -->
   <div class="inv-actions" id="invActions" style="display: none;">
     <button type="button" class="btn-print" onclick="downloadPDF()">Download PDF Again</button>
     <button type="button" class="btn-new" onclick="newEntry()">+ New Entry</button>
@@ -497,11 +492,27 @@
 </div>
 
 <script>
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz4j7HZ71_STCQsKmZZWhnrVFhkENWNeHzfmM7Q4DbPAyPKYCogeENa7wvl6H8z8BNu/exec";
+
   let rowCounter = 0;
   let currentPdfFilename = "Invoice.pdf";
 
+  // Sync highest series number across both Billing & Commercial_Billing tabs
+  async function syncInvoiceSeries() {
+    try {
+      const res = await fetch(WEBAPP_URL);
+      const data = await res.json();
+      if (data.status === "success" && data.latestInvoiceNum) {
+        const localNum = parseInt(localStorage.getItem("rrs_custom_series") || "174", 10);
+        if (data.latestInvoiceNum > localNum) {
+          localStorage.setItem("rrs_custom_series", data.latestInvoiceNum);
+        }
+      }
+    } catch (e) {}
+  }
+
   function getNextInvoiceNumber() {
-    let lastNum = parseInt(localStorage.getItem("rrs_custom_series") || "153", 10);
+    let lastNum = parseInt(localStorage.getItem("rrs_custom_series") || "174", 10);
     let nextNum = lastNum + 1;
     localStorage.setItem("rrs_custom_series", nextNum);
     return "RRS-" + String(nextNum).padStart(3, "0");
@@ -590,9 +601,10 @@
     });
   }
 
-  function generateInvoice() {
+  async function generateInvoice() {
     const customerName = document.getElementById("customerName").value.trim();
     const statusEl = document.getElementById("status");
+    const btn = document.getElementById("generateBtn");
 
     if (!customerName) {
       statusEl.style.color = "red";
@@ -620,40 +632,65 @@
       items.push({ name, qty, price, total: rowTotal });
     }
 
+    btn.disabled = true;
+    btn.innerText = "Saving & Downloading PDF...";
     statusEl.innerText = "";
 
-    const now = new Date();
-    const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-    const invCode = getNextInvoiceNumber();
-    const safeCustomer = customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
-    currentPdfFilename = safeCustomer + "_" + invCode + ".pdf";
+    try {
+      await syncInvoiceSeries();
+      const invCode = getNextInvoiceNumber();
 
-    document.getElementById("invNo").innerText = "[" + invCode + "]";
-    document.getElementById("invDate").innerText = dateStr;
-    document.getElementById("invCustomer").innerText = customerName;
+      await fetch(WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "save_commercial_bill",
+          invoiceNo: "[" + invCode + "]",
+          customerName: customerName,
+          grandTotal: grandTotal
+        })
+      });
 
-    const tbody = document.getElementById("invProdBody");
-    tbody.innerHTML = "";
-    items.forEach((item, idx) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="col-sno">${idx + 1}</td>
-        <td class="col-name">${item.name}</td>
-        <td class="col-qtyprice">${item.qty} × ₹${item.price}</td>
-        <td class="col-total">₹${item.total}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+      const safeCustomer = customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
+      currentPdfFilename = safeCustomer + "_" + invCode + ".pdf";
 
-    document.getElementById("invGrandTotal").innerText = "₹" + grandTotal;
+      document.getElementById("invNo").innerText = "[" + invCode + "]";
+      document.getElementById("invDate").innerText = dateStr;
+      document.getElementById("invCustomer").innerText = customerName;
 
-    document.getElementById("formSection").style.display = "none";
-    document.getElementById("invoiceSection").style.display = "block";
-    document.getElementById("invActions").style.display = "grid";
+      const tbody = document.getElementById("invProdBody");
+      tbody.innerHTML = "";
+      items.forEach((item, idx) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="col-sno">${idx + 1}</td>
+          <td class="col-name">${item.name}</td>
+          <td class="col-qtyprice">${item.qty} × ₹${item.price}</td>
+          <td class="col-total">₹${item.total}</td>
+        `;
+        tbody.appendChild(tr);
+      });
 
-    setTimeout(() => {
-      downloadPDF();
-    }, 350);
+      document.getElementById("invGrandTotal").innerText = "₹" + grandTotal;
+
+      document.getElementById("formSection").style.display = "none";
+      document.getElementById("invoiceSection").style.display = "block";
+      document.getElementById("invActions").style.display = "grid";
+
+      setTimeout(() => {
+        downloadPDF();
+      }, 350);
+
+    } catch (err) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Error: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Save & Download Invoice";
+    }
   }
 
   function newEntry() {
@@ -664,10 +701,11 @@
     document.getElementById("invoiceSection").style.display = "none";
     document.getElementById("invActions").style.display = "none";
     document.getElementById("formSection").style.display = "flex";
+    syncInvoiceSeries();
   }
 
-  // Initial 1 product row
   addProductRow();
+  syncInvoiceSeries();
 </script>
 
 </body>
