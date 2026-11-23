@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RRS FlexoraHub - View & Edit Invoices</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    html, body {
+      margin: 0;
+      padding: 14px;
+      width: 100%;
+      min-height: 100vh;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+    }
+
+    .website-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 1120px;
+      min-height: calc(100vh - 28px);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .banner-wrapper {
+      width: 100%;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: center;
+      padding: 6px 12px;
+    }
+    .banner-img {
+      width: 100%;
+      max-height: 140px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding: 10px 28px;
+    }
+    .home-btn {
+      text-decoration: none;
+      padding: 7px 14px;
+      background: #eef4ff;
+      color: rgb(3, 64, 171);
+      border: 1px solid #bfdbfe;
+      border-radius: 7px;
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+    .home-btn:hover {
+      background: rgb(3, 64, 171);
+      color: #ffffff;
+    }
+    .page-tag {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .content-area {
+      width: 100%;
+      padding: 18px 28px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    h2 {
+      margin: 0 0 18px;
+      color: rgb(3, 64, 171);
+      font-size: 22px;
+      text-align: center;
+      letter-spacing: 0.3px;
+      border-bottom: 1.5px solid #eef4ff;
+      padding-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      background: #ffffff;
+    }
+    input:focus {
+      border-color: rgb(3, 64, 171);
+    }
+
+    /* Search & Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+    .btn-refresh {
+      padding: 11px 20px;
+      background: #eef4ff;
+      color: rgb(3, 64, 171);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-refresh:hover {
+      background: rgb(3, 64, 171);
+      color: #ffffff;
+    }
+
+    /* All Invoices Table */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+    }
+    .all-inv-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .all-inv-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1.5px solid #cbd5e1;
+    }
+    .all-inv-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14.5px;
+      color: #0f172a;
+    }
+    .all-inv-table tr:hover {
+      background: #f8fafc;
+    }
+    .badge-paid {
+      background: #fee2e2;
+      color: #dc2626;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #fecaca;
+    }
+    .badge-bal {
+      background: #fef3c7;
+      color: #b45309;
+      font-weight: 700;
+      font-size: 12.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .btn-edit-row {
+      padding: 7px 14px;
+      background: rgb(3, 64, 171);
+      color: #ffffff;
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-edit-row:hover {
+      background: #022d7a;
+    }
+
+    /* Edit Payment Panel */
+    #editPanel {
+      display: none;
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .edit-card {
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 22px 26px;
+      background: #ffffff;
+    }
+    .edit-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid #eef4ff;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+    .edit-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .stat-pill {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+    .stat-pill span {
+      display: block;
+      font-size: 12.5px;
+      color: #475569;
+      font-weight: 600;
+    }
+    .stat-pill strong {
+      display: block;
+      font-size: 20px;
+      margin-top: 4px;
+      color: #0f172a;
+    }
+    .history-note {
+      font-size: 13px;
+      color: #475569;
+      background: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 18px;
+    }
+    .payment-entry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+    .calc-received-box {
+      background: #eef4ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 18px;
+      font-weight: 800;
+      color: rgb(3, 64, 171);
+      text-align: right;
+    }
+    .edit-btn-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 14px;
+    }
+    .btn-back-list {
+      padding: 14px;
+      background: #e2e8f0;
+      color: #1e293b;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .save-btn {
+      padding: 14px 24px;
+      background: rgb(3, 64, 171);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .save-btn:hover { background: #022d7a; }
+    .save-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    /* INVOICE TEMPLATE STYLES */
+    #invoiceSection {
+      display: none;
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 20px 28px 28px;
+    }
+    .inv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #cbd5e1;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .inv-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: rgb(3, 64, 171);
+      letter-spacing: 0.5px;
+    }
+    .inv-meta {
+      font-size: 13px;
+      color: #64748b;
+      text-align: right;
+    }
+    .inv-customer-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+      margin-bottom: 18px;
+      font-size: 15px;
+    }
+    .inv-customer-line span {
+      color: #475569;
+      font-weight: 600;
+    }
+    .inv-customer-line strong {
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .inv-section-heading {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgb(3, 64, 171);
+      margin: 0 0 8px;
+    }
+    .inv-prod-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .inv-prod-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 8px;
+      border-top: 1px solid #cbd5e1;
+      border-bottom: 1.5px solid #cbd5e1;
+    }
+    .inv-prod-table td {
+      padding: 11px 8px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14.5px;
+      color: #0f172a;
+    }
+    .col-sno { width: 52px; text-align: left; font-weight: 700; color: #475569 !important; }
+    .col-name { text-align: left; font-weight: 600; }
+    .col-qtyprice { text-align: right; color: #334155 !important; font-weight: 600; }
+    .col-total { text-align: right; font-weight: 700; }
+
+    .inv-summary-block {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .inv-sub-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    .inv-sub-row span {
+      font-weight: 600;
+      color: #475569;
+    }
+    .inv-sub-row strong {
+      font-size: 17px;
+      color: #0f172a;
+    }
+    .inv-total-row {
+      background: #eef4ff;
+      border-radius: 10px;
+      padding: 15px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1.5px solid #bfdbfe;
+    }
+    .inv-total-row span {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+    .inv-total-row strong {
+      font-size: 24px;
+      color: rgb(3, 64, 171);
+    }
+
+    /* Red PAID Stamp */
+    .paid-stamp-box {
+      display: none;
+      margin-top: 16px;
+      text-align: center;
+    }
+    .paid-stamp {
+      display: inline-block;
+      border: 3.5px solid #dc2626;
+      color: #dc2626;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      padding: 6px 32px;
+      border-radius: 8px;
+      text-transform: uppercase;
+    }
+
+    .inv-footer {
+      text-align: center;
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 18px;
+    }
+
+    .inv-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      max-width: 680px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 28px 28px;
+    }
+    .btn-print {
+      padding: 13px;
+      background: rgb(3, 64, 171);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-new {
+      padding: 13px;
+      background: #e2e8f0;
+      color: #1e293b;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* PDF Capture Mode */
+    .pdf-capturing {
+      max-width: 680px !important;
+      width: 680px !important;
+      min-height: auto !important;
+      height: auto !important;
+      margin: 0 auto !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+    .pdf-capturing .banner-wrapper {
+      padding: 0 28px 6px !important;
+      border-bottom: none !important;
+    }
+    .pdf-capturing .banner-img {
+      max-height: none !important;
+      width: 100% !important;
+      object-fit: cover !important;
+    }
+
+    @media (max-width: 760px) {
+      .edit-stats-grid, .payment-entry-grid, .edit-btn-row { grid-template-columns: 1fr; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="website-container" id="mainContainer">
+  <div id="pdfContent" style="background: #ffffff; width: 100%; flex: 1; display: flex; flex-direction: column;">
+    <div class="banner-wrapper">
+      <img src="Flexora%20HUB%20Banner.png" alt="Flexora HUB Banner" class="banner-img" />
+    </div>
+
+    <div class="top-nav" id="topNav">
+      <a href="index.html" class="home-btn">← Home</a>
+      <div class="page-tag">View All & Edit Commercial Invoices</div>
+    </div>
+
+    <!-- LIST OF ALL INVOICES SECTION -->
+    <div class="content-area" id="listSection">
+      <h2>All Commercial Invoices</h2>
+
+      <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="Search by Invoice No (e.g. 189) or Customer Name..." oninput="renderTable()" />
+        <button type="button" class="btn-refresh" onclick="loadInvoices()">↻ Refresh List</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="all-inv-table">
+          <thead>
+            <tr>
+              <th>Invoice No</th>
+              <th>Date</th>
+              <th>Customer Name</th>
+              <th>Invoice Total</th>
+              <th>Received</th>
+              <th>Balance / Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="invoicesTableBody">
+            <tr><td colspan="7" style="text-align:center; color:#64748b; padding:24px;">Loading invoices from Google Sheet...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EDIT PAYMENT SECTION (Amount Edit Only, Products Locked) -->
+    <div class="content-area" id="editPanel">
+      <h2>Update Balance Payment</h2>
+
+      <div class="edit-card">
+        <div class="edit-card-header">
+          <div>
+            <div style="font-size:13px; color:#64748b; font-weight:600;">Name of the Customer</div>
+            <div id="editCustName" style="font-size:20px; font-weight:800; color:#0f172a;">-</div>
+          </div>
+          <div style="text-align:right;">
+            <div id="editInvNo" style="font-size:17px; font-weight:800; color:rgb(3, 64, 171);">[RRS-179]</div>
+            <div id="editInvDate" style="font-size:13px; color:#64748b;">-</div>
+          </div>
+        </div>
+
+        <div class="edit-stats-grid">
+          <div class="stat-pill">
+            <span>Invoice Total Amount</span>
+            <strong id="editTotalAmt">₹0</strong>
+          </div>
+          <div class="stat-pill">
+            <span>Advance Received</span>
+            <strong id="editPrevReceived" style="color:#059669;">₹0</strong>
+          </div>
+          <div class="stat-pill">
+            <span>Balance Amount to Pay</span>
+            <strong id="editCurrBalance" style="color:#dc2626;">₹0</strong>
+          </div>
+        </div>
+
+        <div class="history-note" id="editHistoryText">Received History: None</div>
+
+        <div class="payment-entry-grid">
+          <div>
+            <label>Balance Amount Received from Customer (₹)</label>
+            <input type="number" id="newPaymentInput" min="0" step="0.01" placeholder="Enter amount received now" oninput="calculateTotalReceived()" />
+          </div>
+          <div>
+            <label>Total Amount Received from Customer</label>
+            <div class="calc-received-box" id="editTotalReceivedDisp">₹0</div>
+          </div>
+        </div>
+
+        <div class="edit-btn-row">
+          <button type="button" class="btn-back-list" onclick="backToList()">← Back to List</button>
+          <button type="button" class="save-btn" id="btnSavePayment" onclick="savePaymentUpdate()">Save & Download Invoice</button>
+        </div>
+        <div id="editStatus" style="margin-top:10px; text-align:center; font-size:13.5px; font-weight:600;"></div>
+      </div>
+    </div>
+
+    <!-- INVOICE PREVIEW & PDF TEMPLATE -->
+    <div id="invoiceSection">
+      <div class="inv-header">
+        <div class="inv-title">INVOICE</div>
+        <div class="inv-meta">
+          <div id="invNo" style="font-weight: 700; color: #0f172a; font-size: 14px;">[RRS-175]</div>
+          <div id="invDate"></div>
+        </div>
+      </div>
+
+      <div class="inv-customer-line">
+        <span>Name of the Customer</span>
+        <strong id="invCustomer">-</strong>
+      </div>
+
+      <div class="inv-section-heading">List of Products</div>
+      <table class="inv-prod-table">
+        <thead>
+          <tr>
+            <th class="col-sno">S.No</th>
+            <th class="col-name">Product Name</th>
+            <th class="col-qtyprice">Qty × Price</th>
+            <th class="col-total">Total</th>
+          </tr>
+        </thead>
+        <tbody id="invProdBody"></tbody>
+      </table>
+
+      <div class="inv-summary-block">
+        <div class="inv-sub-row" id="invSubTotalRow" style="display: none;">
+          <span>Total Amount</span>
+          <strong id="invSubTotal">₹0</strong>
+        </div>
+
+        <div class="inv-sub-row" id="invAdvanceRow" style="display: none;">
+          <span>Total Amount Received from Customer</span>
+          <strong id="invAdvance" style="color: #059669;">₹0</strong>
+        </div>
+
+        <div class="inv-total-row">
+          <span id="invFinalLabel">Total Amount</span>
+          <strong id="invGrandTotal">₹0</strong>
+        </div>
+      </div>
+
+      <!-- Red PAID Stamp when Total Received == Invoice Total -->
+      <div class="paid-stamp-box" id="paidStampBox">
+        <div class="paid-stamp">PAID</div>
+      </div>
+
+      <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
+    </div>
+  </div>
+
+  <!-- Action Buttons (PDF-la varaadhu) -->
+  <div class="inv-actions" id="invActions" style="display: none;">
+    <button type="button" class="btn-print" onclick="downloadPDF()">Download PDF Again</button>
+    <button type="button" class="btn-new" onclick="backToList()">← Back to All Invoices</button>
+  </div>
+</div>
+
+<script>
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz4j7HZ71_STCQsKmZZWhnrVFhkENWNeHzfmM7Q4DbPAyPKYCogeENa7wvl6H8z8BNu/exec";
+
+  let allInvoices = [];
+  let selectedInv = null;
+  let currentPdfFilename = "Invoice.pdf";
+
+  async function loadInvoices() {
+    const tbody = document.getElementById("invoicesTableBody");
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:24px;">Loading invoices...</td></tr>`;
+
+    try {
+      const res = await fetch(WEBAPP_URL);
+      const data = await res.json();
+      if (data.status === "success") {
+        allInvoices = (data.commercialInvoices || []).reverse();
+        renderTable();
+      }
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red; padding:24px;">Error: ${err.message}</td></tr>`;
+    }
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("invoicesTableBody");
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+
+    const filtered = allInvoices.filter(inv =>
+      inv.invoiceNo.toLowerCase().includes(q) || inv.customerName.toLowerCase().includes(q)
+    );
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:24px;">No commercial invoices found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = "";
+    filtered.forEach(inv => {
+      const isPaid = inv.balanceAmount <= 0;
+      const statusBadge = isPaid
+        ? `<span class="badge-paid">PAID</span>`
+        : `<span class="badge-bal">Bal: ₹${inv.balanceAmount}</span>`;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="font-weight:700; color:rgb(3, 64, 171);">${inv.invoiceNo}</td>
+        <td>${inv.invoiceDate}</td>
+        <td style="font-weight:600;">${inv.customerName}</td>
+        <td style="font-weight:700;">₹${inv.totalAmount}</td>
+        <td style="color:#059669; font-weight:700;">₹${inv.receivedAmount}</td>
+        <td>${statusBadge}</td>
+        <td><button type="button" class="btn-edit-row" onclick="openEditInvoice('${inv.invoiceNo}')">View / Edit</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function openEditInvoice(invNo) {
+    selectedInv = allInvoices.find(inv => inv.invoiceNo === invNo);
+    if (!selectedInv) return;
+
+    document.getElementById("editCustName").innerText = selectedInv.customerName;
+    document.getElementById("editInvNo").innerText = selectedInv.invoiceNo;
+    document.getElementById("editInvDate").innerText = selectedInv.invoiceDate;
+    document.getElementById("editTotalAmt").innerText = "₹" + selectedInv.totalAmount;
+    document.getElementById("editPrevReceived").innerText = "₹" + selectedInv.receivedAmount;
+    document.getElementById("editCurrBalance").innerText = "₹" + selectedInv.balanceAmount;
+    document.getElementById("editHistoryText").innerText = "Received History (Date & Amount): " + (selectedInv.history || "No payments recorded yet");
+
+    document.getElementById("newPaymentInput").value = "";
+    document.getElementById("editTotalReceivedDisp").innerText = "₹" + selectedInv.receivedAmount;
+    document.getElementById("editStatus").innerText = "";
+
+    document.getElementById("listSection").style.display = "none";
+    document.getElementById("invoiceSection").style.display = "none";
+    document.getElementById("invActions").style.display = "none";
+    document.getElementById("editPanel").style.display = "flex";
+  }
+
+  function calculateTotalReceived() {
+    if (!selectedInv) return;
+    const addPay = parseFloat(document.getElementById("newPaymentInput").value) || 0;
+    const totalRec = +(selectedInv.receivedAmount + addPay).toFixed(2);
+    document.getElementById("editTotalReceivedDisp").innerText = "₹" + totalRec;
+  }
+
+  function backToList() {
+    document.getElementById("editPanel").style.display = "none";
+    document.getElementById("invoiceSection").style.display = "none";
+    document.getElementById("invActions").style.display = "none";
+    document.getElementById("listSection").style.display = "flex";
+    loadInvoices();
+  }
+
+  function downloadPDF() {
+    const topNav = document.getElementById("topNav");
+    const container = document.getElementById("mainContainer");
+    const element = document.getElementById("pdfContent");
+
+    topNav.style.display = "none";
+    container.classList.add("pdf-capturing");
+
+    const opt = {
+      margin:       8,
+      filename:     currentPdfFilename,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+      jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      container.classList.remove("pdf-capturing");
+      topNav.style.display = "flex";
+    });
+  }
+
+  async function savePaymentUpdate() {
+    if (!selectedInv) return;
+    const newPay = parseFloat(document.getElementById("newPaymentInput").value) || 0;
+    const statusEl = document.getElementById("editStatus");
+    const btn = document.getElementById("btnSavePayment");
+
+    if (newPay < 0) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Valid amount enter pannunga!";
+      return;
+    }
+    if (newPay > selectedInv.balanceAmount) {
+      statusEl.style.color = "red";
+      statusEl.innerText = `Balance ₹${selectedInv.balanceAmount}-vida adhigama poda mudiyaadhu!`;
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Saving & Downloading PDF...";
+    statusEl.innerText = "";
+
+    try {
+      if (newPay > 0) {
+        await fetch(WEBAPP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "update_commercial_payment",
+            invoiceNo: selectedInv.invoiceNo,
+            newPayment: newPay
+          })
+        });
+      }
+
+      const totalAmt = selectedInv.totalAmount;
+      const totalReceived = +(selectedInv.receivedAmount + newPay).toFixed(2);
+      const finalBalance = Math.max(0, +(totalAmt - totalReceived).toFixed(2));
+
+      let parsedItems = [];
+      try {
+        parsedItems = JSON.parse(selectedInv.itemsJson || "[]");
+      } catch (e) {}
+
+      if (parsedItems.length === 0) {
+        parsedItems = [{ name: "Commercial Order (" + selectedInv.invoiceNo + ")", qty: 1, price: totalAmt, total: totalAmt }];
+      }
+
+      const cleanInv = selectedInv.invoiceNo.replace(/[\[\]]/g, "");
+      const safeCustomer = selectedInv.customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
+      currentPdfFilename = safeCustomer + "_" + cleanInv + ".pdf";
+
+      document.getElementById("invNo").innerText = selectedInv.invoiceNo;
+      document.getElementById("invDate").innerText = selectedInv.invoiceDate;
+      document.getElementById("invCustomer").innerText = selectedInv.customerName;
+
+      const tbody = document.getElementById("invProdBody");
+      tbody.innerHTML = "";
+      parsedItems.forEach((item, idx) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="col-sno">${idx + 1}</td>
+          <td class="col-name">${item.name}</td>
+          <td class="col-qtyprice">${item.qty} × ₹${item.price}</td>
+          <td class="col-total">₹${item.total}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const paidBox = document.getElementById("paidStampBox");
+
+      if (totalReceived > 0) {
+        document.getElementById("invSubTotalRow").style.display = "flex";
+        document.getElementById("invAdvanceRow").style.display = "flex";
+        document.getElementById("invSubTotal").innerText = "₹" + totalAmt;
+        document.getElementById("invAdvance").innerText = "₹" + totalReceived;
+        document.getElementById("invFinalLabel").innerText = "Balance to Pay";
+        document.getElementById("invGrandTotal").innerText = "₹" + finalBalance;
+
+        // Red PAID Stamp if Balance == 0
+        paidBox.style.display = finalBalance <= 0 ? "block" : "none";
+      } else {
+        document.getElementById("invSubTotalRow").style.display = "none";
+        document.getElementById("invAdvanceRow").style.display = "none";
+        document.getElementById("invFinalLabel").innerText = "Total Amount";
+        document.getElementById("invGrandTotal").innerText = "₹" + totalAmt;
+        paidBox.style.display = "none";
+      }
+
+      document.getElementById("editPanel").style.display = "none";
+      document.getElementById("invoiceSection").style.display = "block";
+      document.getElementById("invActions").style.display = "grid";
+
+      setTimeout(() => {
+        downloadPDF();
+      }, 350);
+
+    } catch (err) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Error: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Save & Download Invoice";
+    }
+  }
+
+  loadInvoices();
+</script>
+
+</body>
+</html>
