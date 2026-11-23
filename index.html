@@ -19,7 +19,7 @@
     .portal-container {
       background: #ffffff;
       width: 100%;
-      max-width: 900px;
+      max-width: 1060px;
       border: 1px solid #cbd5e1;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(3, 64, 171, 0.08);
@@ -40,7 +40,7 @@
       display: block;
     }
     .portal-body {
-      padding: 36px 40px 44px;
+      padding: 34px 36px 42px;
       text-align: center;
     }
     h1 {
@@ -50,15 +50,15 @@
       font-weight: 800;
     }
     p.subtitle {
-      margin: 0 0 32px;
+      margin: 0 0 30px;
       color: #64748b;
       font-size: 15px;
       font-weight: 500;
     }
     .choice-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
     }
     .choice-card {
       display: flex;
@@ -68,7 +68,7 @@
       background: #f8fafc;
       border: 2px solid #cbd5e1;
       border-radius: 14px;
-      padding: 28px 24px;
+      padding: 24px 20px;
       transition: all 0.2s ease;
       cursor: pointer;
     }
@@ -79,27 +79,27 @@
       box-shadow: 0 8px 20px rgba(3, 64, 171, 0.12);
     }
     .card-title {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
       color: rgb(3, 64, 171);
       margin-bottom: 10px;
     }
     .card-desc {
-      font-size: 14px;
+      font-size: 13.5px;
       color: #475569;
       line-height: 1.5;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
     .card-btn {
       display: inline-block;
-      padding: 12px 20px;
+      padding: 11px 16px;
       background: rgb(3, 64, 171);
       color: #ffffff;
       border-radius: 9px;
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 700;
     }
-    @media (max-width: 640px) {
+    @media (max-width: 820px) {
       .choice-grid { grid-template-columns: 1fr; }
       .portal-body { padding: 24px 20px 30px; }
     }
@@ -114,7 +114,7 @@
 
   <div class="portal-body">
     <h1>Select Billing System</h1>
-    <p class="subtitle">Choose which billing portal you want to open</p>
+    <p class="subtitle">Choose which portal you want to open</p>
 
     <div class="choice-grid">
       <a href="printer.html" class="choice-card">
@@ -125,12 +125,20 @@
         <div class="card-btn">Open Printer Billing →</div>
       </a>
 
-      <a href="commercial.html" class="choice-card">
+      <a href="ordinary.html" class="choice-card">
         <div>
-          <div class="card-title">commercial Billing</div>
-          <div class="card-desc">Design, Photo Frames, Tech & General Solutions billing and invoice generation.</div>
+          <div class="card-title">Commercial Billing</div>
+          <div class="card-desc">Multi-product billing, optional advance entry, and instant A5 PDF invoice generation.</div>
         </div>
-        <div class="card-btn">Open commercial Billing →</div>
+        <div class="card-btn">Open Commercial Billing →</div>
+      </a>
+
+      <a href="edit_invoice.html" class="choice-card">
+        <div>
+          <div class="card-title">View & Edit Invoices</div>
+          <div class="card-desc">View all commercial invoices, update balance payments received, and download PAID receipts.</div>
+        </div>
+        <div class="card-btn">View / Edit Invoices →</div>
       </a>
     </div>
   </div>
