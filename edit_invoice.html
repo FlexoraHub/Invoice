@@ -339,9 +339,7 @@
     .save-btn:hover { background: #022d7a; }
     .save-btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    /* ==========================================================
-       PAYMENT STATEMENT INVOICE TEMPLATE (AS PER YOUR SPECS)
-       ========================================================== */
+    /* PAYMENT STATEMENT INVOICE TEMPLATE */
     #invoiceSection {
       display: none;
       width: 100%;
@@ -557,7 +555,7 @@
           <thead>
             <tr>
               <th>Invoice No</th>
-              <th>Day & Date</th>
+              <th>Day - Date</th>
               <th>Customer Name</th>
               <th>Invoice Total</th>
               <th>Received</th>
@@ -614,7 +612,7 @@
           </div>
         </div>
 
-        <!-- Print With Stamp / Without Stamp Toggle (Shown when Balance is 0) -->
+        <!-- Print With Stamp / Without Stamp Toggle -->
         <div class="stamp-toggle-bar" id="editStampToggleBox" style="display: none;">
           <span id="editStampLabel">Print Mode: Print With Stamp (PAID)</span>
           <label class="switch">
@@ -634,7 +632,6 @@
 
     <!-- 3. PAYMENT STATEMENT INVOICE TEMPLATE -->
     <div id="invoiceSection">
-      <!-- Top Row: Left Customer Name | Right Invoice No -->
       <div class="stmt-top-row">
         <div class="stmt-cust-block">
           <span>Customer Name</span>
@@ -646,10 +643,8 @@
         </div>
       </div>
 
-      <!-- Heading: Payment Details -->
       <div class="stmt-heading">Payment Details</div>
 
-      <!-- Payment Details Table + Center PAID Stamp -->
       <div class="stmt-table-wrapper">
         <table class="stmt-table">
           <thead>
@@ -662,24 +657,20 @@
           <tbody id="stmtBody"></tbody>
         </table>
 
-        <!-- Center PAID Stamp -->
         <div class="center-paid-stamp" id="centerPaidStamp">PAID</div>
       </div>
 
-      <!-- Balance Box -->
       <div class="stmt-balance-box">
         <span>Balance Amount to Collect</span>
         <strong id="stmtBalanceAmt">₹0</strong>
       </div>
 
-      <!-- Bottom Right Corner Note -->
       <div class="stmt-bottom-note">Computer Generated Invoice</div>
     </div>
   </div>
 
   <!-- Preview Actions (Not included in PDF) -->
   <div class="inv-actions" id="invActions">
-    <!-- Stamp Toggle also accessible right before downloading -->
     <div class="stamp-toggle-bar" id="previewStampToggleBox" style="display: none; margin-bottom: 0;">
       <span id="previewStampLabel">Print Mode: Print With Stamp (PAID)</span>
       <label class="switch">
@@ -703,6 +694,19 @@
   let currentPdfFilename = "Invoice.pdf";
   let printWithStamp = true;
 
+  // Strips "00:00:00 GMT+0530 (India Standard Time)" and returns clean "Mon - 23 Nov 2026"
+  function formatCleanDayDate(rawVal) {
+    if (!rawVal) return "-";
+    const str = String(rawVal).trim();
+    const parsed = new Date(str);
+    if (!isNaN(parsed.getTime())) {
+      const weekday = parsed.toLocaleDateString("en-GB", { weekday: "short" });
+      const datePart = parsed.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+      return `${weekday} - ${datePart}`;
+    }
+    return str.replace(/\s*\d{2}:\d{2}:\d{2}.*$/, "").replace(",", " -");
+  }
+
   function syncStampToggle(isChecked) {
     printWithStamp = isChecked;
     document.getElementById("stampToggleCheck").checked = isChecked;
@@ -714,7 +718,6 @@
     document.getElementById("editStampLabel").innerText = labelText;
     document.getElementById("previewStampLabel").innerText = labelText;
 
-    // Update live stamp visibility in invoice preview
     const stampEl = document.getElementById("centerPaidStamp");
     if (stampEl.dataset.isZero === "true") {
       stampEl.style.display = isChecked ? "block" : "none";
@@ -753,6 +756,7 @@
     tbody.innerHTML = "";
     filtered.forEach(inv => {
       const isPaid = inv.balanceAmount <= 0;
+      const cleanDate = formatCleanDayDate(inv.invoiceDate);
       const statusBadge = isPaid
         ? `<span class="badge-paid">PAID (₹0)</span>`
         : `<span class="badge-bal">Bal: ₹${inv.balanceAmount}</span>`;
@@ -760,7 +764,7 @@
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td style="font-weight:700; color:rgb(3, 64, 171);">${inv.invoiceNo}</td>
-        <td>${inv.invoiceDate}</td>
+        <td>${cleanDate}</td>
         <td style="font-weight:600;">${inv.customerName}</td>
         <td style="font-weight:700;">₹${inv.totalAmount}</td>
         <td style="color:#059669; font-weight:700;">₹${inv.receivedAmount}</td>
@@ -775,9 +779,10 @@
     selectedInv = allInvoices.find(inv => inv.invoiceNo === invNo);
     if (!selectedInv) return;
 
+    const cleanDate = formatCleanDayDate(selectedInv.invoiceDate);
     document.getElementById("editCustName").innerText = selectedInv.customerName;
     document.getElementById("editInvNo").innerText = selectedInv.invoiceNo;
-    document.getElementById("editInvDate").innerText = selectedInv.invoiceDate;
+    document.getElementById("editInvDate").innerText = cleanDate;
     document.getElementById("editTotalAmt").innerText = "₹" + selectedInv.totalAmount;
     document.getElementById("editAdvAmt").innerText = "₹" + selectedInv.advanceAmount;
     document.getElementById("editCurrBalance").innerText = "₹" + selectedInv.balanceAmount;
@@ -786,7 +791,6 @@
     document.getElementById("editTotalReceivedDisp").innerText = "₹" + selectedInv.receivedAmount;
     document.getElementById("editStatus").innerText = "";
 
-    // If balance is already 0, show Stamp Toggle & disable adding more payment
     const isAlreadyPaid = selectedInv.balanceAmount <= 0;
     document.getElementById("paymentInputGrid").style.display = isAlreadyPaid ? "none" : "grid";
     document.getElementById("btnSavePayment").style.display = isAlreadyPaid ? "none" : "block";
@@ -820,7 +824,7 @@
     parts.forEach(p => {
       const seg = p.split("|");
       if (seg.length === 2) {
-        entries.push({ date: seg[0].trim(), amount: Number(seg[1]) || 0 });
+        entries.push({ date: formatCleanDayDate(seg[0].trim()), amount: Number(seg[1]) || 0 });
       }
     });
     return entries;
@@ -829,6 +833,7 @@
   function renderStatementInvoice(invObj, extraPaymentObj) {
     const cleanInv = invObj.invoiceNo.replace(/[\[\]]/g, "");
     const safeCustomer = invObj.customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
+    const cleanInvDate = formatCleanDayDate(invObj.invoiceDate);
     currentPdfFilename = safeCustomer + "_" + cleanInv + "_Statement.pdf";
 
     document.getElementById("stmtCustName").innerText = invObj.customerName;
@@ -837,11 +842,11 @@
     const tbody = document.getElementById("stmtBody");
     tbody.innerHTML = "";
 
-    // Row 1: Invoice Amount (Left: Invoice No, Center: Date, Right: Total Amount)
+    // Row 1: Invoice Amount
     const trInv = document.createElement("tr");
     trInv.innerHTML = `
       <td class="col-desc">Invoice Amount (${invObj.invoiceNo})</td>
-      <td class="col-date">${invObj.invoiceDate}</td>
+      <td class="col-date">${cleanInvDate}</td>
       <td class="col-amt">₹${invObj.totalAmount}</td>
     `;
     tbody.appendChild(trInv);
@@ -851,7 +856,7 @@
       const trAdv = document.createElement("tr");
       trAdv.innerHTML = `
         <td class="col-desc">Advance</td>
-        <td class="col-date">${invObj.invoiceDate}</td>
+        <td class="col-date">${cleanInvDate}</td>
         <td class="col-amt" style="color:#059669;">₹${invObj.advanceAmount}</td>
       `;
       tbody.appendChild(trAdv);
@@ -860,7 +865,7 @@
     // Subsequent Rows: Amount 1, Amount 2, Amount 3...
     const historyList = parseHistoryEntries(invObj.historyRaw);
     if (extraPaymentObj && extraPaymentObj.amount > 0) {
-      historyList.push(extraPaymentObj);
+      historyList.push({ date: formatCleanDayDate(extraPaymentObj.date), amount: extraPaymentObj.amount });
     }
 
     let instSum = 0;
@@ -884,7 +889,6 @@
     const stampEl = document.getElementById("centerPaidStamp");
     stampEl.dataset.isZero = isZeroBalance ? "true" : "false";
 
-    // Show toggle & center stamp ONLY when balance == 0
     document.getElementById("previewStampToggleBox").style.display = isZeroBalance ? "flex" : "none";
     stampEl.style.display = (isZeroBalance && printWithStamp) ? "block" : "none";
 
@@ -956,12 +960,8 @@
         })
       });
 
-      const now = new Date();
-      const dayDateStr = now.toLocaleDateString("en-GB", {
-        weekday: "short", day: "2-digit", month: "short", year: "numeric"
-      });
-
-      renderStatementInvoice(selectedInv, { date: dayDateStr, amount: newPay });
+      const cleanToday = formatCleanDayDate(new Date());
+      renderStatementInvoice(selectedInv, { date: cleanToday, amount: newPay });
 
       setTimeout(() => {
         downloadPDF();
