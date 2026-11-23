@@ -394,6 +394,7 @@
 
     .stmt-table-wrapper {
       position: relative;
+      min-height: 150px;
     }
     .stmt-table {
       width: 100%;
@@ -418,23 +419,22 @@
     .col-date { text-align: center; color: #475569 !important; font-weight: 600; }
     .col-amt  { text-align: right; font-weight: 700; }
 
-    /* Center PAID Stamp Overlay */
+    /* Center Square PAID Stamp Overlay (Matches Image 1) */
     .center-paid-stamp {
       display: none;
       position: absolute;
-      top: 52%;
+      top: 56%;
       left: 50%;
-      transform: translate(-50%, -50%) rotate(-12deg);
-      border: 4px solid rgba(220, 38, 38, 0.85);
-      color: rgba(220, 38, 38, 0.85);
-      font-size: 38px;
-      font-weight: 900;
-      letter-spacing: 6px;
-      padding: 8px 34px;
-      border-radius: 10px;
-      text-transform: uppercase;
+      transform: translate(-50%, -50%) rotate(-10deg);
+      width: 134px;
+      height: 134px;
       pointer-events: none;
-      background: rgba(255, 255, 255, 0.72);
+      z-index: 10;
+    }
+    .center-paid-stamp svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .stmt-balance-box {
@@ -657,7 +657,23 @@
           <tbody id="stmtBody"></tbody>
         </table>
 
-        <div class="center-paid-stamp" id="centerPaidStamp">PAID</div>
+        <!-- Rounded Square Double-Border PAID Stamp with Circle Checkmark -->
+        <div class="center-paid-stamp" id="centerPaidStamp">
+          <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+            <!-- Soft white translucent backing -->
+            <rect x="6" y="6" width="168" height="168" rx="22" fill="rgba(255, 255, 255, 0.86)" />
+            <!-- Outer thick red rounded border -->
+            <rect x="12" y="12" width="156" height="156" rx="18" fill="none" stroke="#d90404" stroke-width="6.5" />
+            <!-- Inner thin red rounded border -->
+            <rect x="22" y="22" width="136" height="136" rx="12" fill="none" stroke="#d90404" stroke-width="2.5" />
+            <!-- Circle around checkmark -->
+            <circle cx="90" cy="68" r="28" fill="none" stroke="#d90404" stroke-width="5.5" />
+            <!-- Bold checkmark -->
+            <path d="M76 68 L86 78 L106 57" fill="none" stroke="#d90404" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" />
+            <!-- Bold PAID text -->
+            <text x="90" y="138" text-anchor="middle" fill="#d90404" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="36" letter-spacing="2">PAID</text>
+          </svg>
+        </div>
       </div>
 
       <div class="stmt-balance-box">
@@ -694,17 +710,24 @@
   let currentPdfFilename = "Invoice.pdf";
   let printWithStamp = true;
 
-  // Strips "00:00:00 GMT+0530 (India Standard Time)" and returns clean "Mon - 23 Nov 2026"
   function formatCleanDayDate(rawVal) {
     if (!rawVal) return "-";
     const str = String(rawVal).trim();
+    const m = str.match(/^([A-Za-z]{3}),?\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/);
+    if (m) {
+      return `${m[1]} - ${m[3].padStart(2, "0")} ${m[2]} ${m[4]}`;
+    }
+    const m2 = str.match(/^([A-Za-z]{3}),?\s+(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/);
+    if (m2) {
+      return `${m2[1]} - ${m2[2].padStart(2, "0")} ${m2[3]} ${m2[4]}`;
+    }
     const parsed = new Date(str);
     if (!isNaN(parsed.getTime())) {
       const weekday = parsed.toLocaleDateString("en-GB", { weekday: "short" });
       const datePart = parsed.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
       return `${weekday} - ${datePart}`;
     }
-    return str.replace(/\s*\d{2}:\d{2}:\d{2}.*$/, "").replace(",", " -");
+    return str.replace(/\s*\d{2}:\d{2}:\d{2}.*$/, "");
   }
 
   function syncStampToggle(isChecked) {
