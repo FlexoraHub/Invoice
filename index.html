@@ -331,10 +331,16 @@
       border-radius: 10px;
       padding: 14px 16px;
       background: #f8fafc;
+      position: relative;
     }
     .stock-card.low {
       border-color: #fca5a5;
       background: #fef2f2;
+    }
+    .stock-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .stock-cat {
       font-size: 11px;
@@ -342,11 +348,26 @@
       text-transform: uppercase;
       color: #64748b;
     }
+    .btn-del-item {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-del-item:hover {
+      background: #dc2626;
+      color: #ffffff;
+    }
     .stock-name {
       font-size: 16px;
       font-weight: 700;
       color: #0f172a;
-      margin: 4px 0 8px;
+      margin: 6px 0 8px;
     }
     .stock-qty {
       font-size: 22px;
@@ -438,7 +459,6 @@
       <h2>Printer Job Entry</h2>
 
       <div class="form-grid">
-        <!-- Row 1: 3 Entries -->
         <div>
           <label>Name of the Customer</label>
           <input type="text" id="customerName" placeholder="Enter Customer Name" />
@@ -454,7 +474,6 @@
           <input type="number" id="numPages" min="1" placeholder="e.g. 10" oninput="calculate()" />
         </div>
 
-        <!-- Row 2: 3 Entries -->
         <div>
           <label>Print Color</label>
           <div class="toggle-group">
@@ -479,7 +498,6 @@
           </div>
         </div>
 
-        <!-- Row 3: 3 Entries -->
         <div>
           <label>Amount Mode</label>
           <div class="toggle-group">
@@ -505,7 +523,6 @@
           </select>
         </div>
 
-        <!-- Row 4: Spiral Details -->
         <div id="spiralBox" style="display:none;">
           <div class="spiral-inline">
             <div>
@@ -520,7 +537,6 @@
         </div>
       </div>
 
-      <!-- Bottom-Left Amount & Bottom-Right Save Button -->
       <div class="bottom-bar">
         <div class="summary-box">
           <div>Paper QTY<strong id="dispQty">0</strong></div>
@@ -593,7 +609,6 @@
       </div>
 
       <div class="stock-forms">
-        <!-- Add Brand New Stock Item (Manual Entry First) -->
         <div class="stock-box">
           <h3>+ Add New Stock Item</h3>
           <div class="field">
@@ -624,7 +639,6 @@
           <div id="newItemStatus" style="margin-top:8px; font-size:13px; font-weight:600; text-align:center;"></div>
         </div>
 
-        <!-- Update Existing Stock -->
         <div class="stock-box">
           <h3>Update Existing Stock (+ / -)</h3>
           <div class="field">
@@ -934,7 +948,6 @@
     document.getElementById("formSection").style.display = "flex";
   }
 
-  // Load only manually added stock items from Google Sheet
   async function loadStock() {
     const grid = document.getElementById("stockCardsGrid");
     const select = document.getElementById("stockItemSelect");
@@ -964,7 +977,10 @@
             const card = document.createElement("div");
             card.className = "stock-card" + (isLow ? " low" : "");
             card.innerHTML = `
-              <div class="stock-cat">${item.category}</div>
+              <div class="stock-card-header">
+                <div class="stock-cat">${item.category}</div>
+                <button type="button" class="btn-del-item" onclick="deleteStockItem('${item.name.replace(/'/g, "\\'")}')">Delete</button>
+              </div>
               <div class="stock-name">${item.name}</div>
               <div class="stock-qty">${item.qty} <span style="font-size:13px;font-weight:600;">${item.unit}</span></div>
               ${isLow ? `<div class="stock-alert-tag">⚠ Low Stock (Limit: ${item.alertLimit})</div>` : ""}
@@ -976,7 +992,6 @@
             opt.text = `${item.name} (${item.qty} ${item.unit})`;
             select.appendChild(opt);
 
-            // Ella manual stock items-ayum Billing dropdown-la kaattum (neenga edha vendumnaalum select panni deduct pannikalam)
             const pOpt = document.createElement("option");
             pOpt.value = item.name;
             pOpt.text = `${item.name} (${item.qty} ${item.unit} left)`;
@@ -999,6 +1014,28 @@
       }
     } catch (err) {
       grid.innerHTML = `<div style="color:red; font-size:13px;">Stock load error: ${err.message}</div>`;
+    }
+  }
+
+  async function deleteStockItem(itemName) {
+    if (!confirm(`"${itemName}" item-a Stock-la irundhu delete pannava?`)) {
+      return;
+    }
+
+    try {
+      await fetch(NEW_STOCK_BILLING_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "delete_item",
+          itemName: itemName
+        })
+      });
+
+      setTimeout(loadStock, 700);
+    } catch (err) {
+      alert("Delete error: " + err.message);
     }
   }
 
@@ -1098,7 +1135,6 @@
     }
   }
 
-  // Initial load
   document.getElementById("autoRate").value = getSavedRate("bw", "single");
   loadStock();
 </script>
