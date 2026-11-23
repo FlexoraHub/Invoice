@@ -207,30 +207,30 @@
       font-weight: 600;
     }
 
-    /* Invoice Styles - Original Compact Receipt Look */
+    /* Invoice Styles - Exact Old Printed Sheet Format */
     #invoiceSection {
       display: none;
-      max-width: 480px;
-      margin: 0 auto;
       width: 100%;
-      padding: 20px 24px 24px;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 20px 28px 28px;
     }
     .inv-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px dashed #cbd5e1;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
     }
     .inv-title {
-      font-size: 19px;
+      font-size: 20px;
       font-weight: 800;
       color: rgb(3, 64, 171);
       letter-spacing: 0.5px;
     }
     .inv-meta {
-      font-size: 12.5px;
+      font-size: 13px;
       color: #64748b;
       text-align: right;
     }
@@ -240,9 +240,9 @@
       margin-top: 6px;
     }
     .inv-table td {
-      padding: 11px 6px;
+      padding: 13px 6px;
       border-bottom: 1px solid #e2e8f0;
-      font-size: 14px;
+      font-size: 15px;
     }
     .inv-table td:first-child {
       color: #475569;
@@ -256,69 +256,70 @@
     .inv-total-row {
       background: #eef4ff;
       border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 16px;
+      padding: 15px 18px;
+      margin-top: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border: 1.5px solid #bfdbfe;
     }
     .inv-total-row span {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       color: #1e3a8a;
     }
     .inv-total-row strong {
-      font-size: 22px;
+      font-size: 24px;
       color: rgb(3, 64, 171);
     }
     .inv-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      max-width: 480px;
+      gap: 14px;
+      max-width: 680px;
       width: 100%;
       margin: 0 auto;
-      padding: 0 24px 24px;
+      padding: 0 28px 28px;
     }
     .btn-print {
-      padding: 12px;
+      padding: 13px;
       background: rgb(3, 64, 171);
       color: #fff;
       border: none;
       border-radius: 10px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
     }
     .btn-new {
-      padding: 12px;
+      padding: 13px;
       background: #e2e8f0;
       color: #1e293b;
       border: none;
       border-radius: 10px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
     }
     .inv-footer {
       text-align: center;
-      font-size: 12.5px;
+      font-size: 13px;
       color: #64748b;
-      margin-top: 16px;
+      margin-top: 18px;
     }
 
-    /* PDF Capture Mode - Ensures full receipt prints cleanly without clipping */
+    /* PDF Capture Mode - Exact Old Full-Sheet Invoice Layout */
     .pdf-capturing {
-      max-width: 480px !important;
-      width: 480px !important;
+      max-width: 680px !important;
+      width: 680px !important;
       min-height: auto !important;
       height: auto !important;
       margin: 0 auto !important;
       border: none !important;
+      border-radius: 0 !important;
     }
     .pdf-capturing .banner-wrapper {
-      padding: 0 !important;
+      padding: 0 28px 6px !important;
       border-bottom: none !important;
     }
     .pdf-capturing .banner-img {
@@ -857,16 +858,15 @@
     const container = document.getElementById("mainContainer");
     const element = document.getElementById("pdfContent");
 
-    // Temporarily switch to compact receipt width & auto-height so full invoice captures cleanly
     navTabs.style.display = "none";
     container.classList.add("pdf-capturing");
 
     const opt = {
-      margin:       10,
+      margin:       8,
       filename:     currentPdfFilename,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(element).save().then(() => {
