@@ -197,7 +197,7 @@
       padding: 3px 9px;
       border-radius: 6px;
     }
-    .badge-paid {
+    .badge- {
       background: #fee2e2;
       color: #dc2626;
       font-weight: 800;
@@ -508,8 +508,8 @@
     .col-date { text-align: center; color: #475569 !important; font-weight: 600; }
     .col-amt  { text-align: right; font-weight: 700; }
 
-    /* Center Rectangular PAID Stamp Overlay */
-    .center-paid-stamp {
+    /* Center Rectangular  Stamp Overlay */
+    .center--stamp {
       display: none;
       position: absolute;
       top: 52%;
@@ -1030,7 +1030,7 @@
 
       const isPaid = inv.balanceAmount <= 0;
       const statusBadge = isPaid
-        ? `<span class="badge-paid">PAID (₹0)</span>`
+        ? `<span class="badge-paid">PAID</span>`
         : `<span class="badge-bal">Bal: ₹${inv.balanceAmount}</span>`;
 
       const tr = document.createElement("tr");
