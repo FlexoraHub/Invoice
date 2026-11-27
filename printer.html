@@ -780,7 +780,6 @@
 </div>
 
 <script>
-  const OLD_PRINTER_SHEET_URL = "https://script.google.com/macros/s/AKfycbx_Rqv5J_psAZw45CKIWQXBDWa-uancPp8gaoIVKTZbc9viMDcx90wB3HJYHeT4tvLsLQ/exec";
   const NEW_STOCK_BILLING_URL = "https://script.google.com/macros/s/AKfycbz4j7HZ71_STCQsKmZZWhnrVFhkENWNeHzfmM7Q4DbPAyPKYCogeENa7wvl6H8z8BNu/exec";
 
   let printColor = "bw";
@@ -980,19 +979,7 @@
     statusEl.innerText = "";
 
     try {
-      const oldSheetReq = fetch(OLD_PRINTER_SHEET_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          jobPurpose: rawJobName,
-          paperQty: paperQty,
-          amtPerPage: amtPerPage,
-          amount: printAmount
-        })
-      });
-
-      const newSheetReq = fetch(NEW_STOCK_BILLING_URL, {
+      await fetch(NEW_STOCK_BILLING_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -1013,8 +1000,6 @@
           amountPaid: amountPaidVal
         })
       });
-
-      await Promise.all([oldSheetReq, newSheetReq]);
 
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
