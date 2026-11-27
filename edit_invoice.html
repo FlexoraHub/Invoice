@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RRS FlexoraHub - View & Edit Invoices</title>
+  <title>RRS FlexoraHub - View & Edit All Invoices</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -20,7 +20,7 @@
     .website-container {
       background: #ffffff;
       width: 100%;
-      max-width: 1120px;
+      max-width: 1140px;
       min-height: calc(100vh - 28px);
       display: flex;
       flex-direction: column;
@@ -91,39 +91,59 @@
 
     label {
       display: block;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
       color: #1e293b;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
-    input[type="text"], input[type="number"] {
+    input[type="text"], input[type="number"], select {
       width: 100%;
-      padding: 11px 13px;
+      padding: 10px 12px;
       border: 1.5px solid #cbd5e1;
       border-radius: 8px;
-      font-size: 15px;
+      font-size: 14.5px;
       outline: none;
       background: #ffffff;
     }
-    input:focus {
+    input:focus, select:focus {
       border-color: rgb(3, 64, 171);
     }
 
     /* Filter Bar */
     .filter-bar {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       margin-bottom: 18px;
       align-items: center;
+      flex-wrap: wrap;
+    }
+    .type-filter-group {
+      display: flex;
+      gap: 6px;
+    }
+    .filter-pill {
+      padding: 10px 16px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      color: #475569;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .filter-pill.active {
+      background: rgb(3, 64, 171);
+      color: #ffffff;
+      border-color: rgb(3, 64, 171);
     }
     .btn-refresh {
-      padding: 11px 20px;
+      padding: 10px 18px;
       background: #eef4ff;
       color: rgb(3, 64, 171);
       border: 1.5px solid #bfdbfe;
       border-radius: 8px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13.5px;
       cursor: pointer;
       white-space: nowrap;
     }
@@ -146,20 +166,36 @@
     .all-inv-table th {
       background: #f1f5f9;
       color: #334155;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 700;
-      padding: 12px 14px;
+      padding: 12px 12px;
       text-align: left;
       border-bottom: 1.5px solid #cbd5e1;
     }
     .all-inv-table td {
-      padding: 12px 14px;
+      padding: 11px 12px;
       border-bottom: 1px solid #e2e8f0;
-      font-size: 14.5px;
+      font-size: 14px;
       color: #0f172a;
     }
     .all-inv-table tr:hover {
       background: #f8fafc;
+    }
+    .type-badge-printer {
+      background: #e0e7ff;
+      color: #3730a3;
+      font-weight: 700;
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+    .type-badge-comm {
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 700;
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 6px;
     }
     .badge-paid {
       background: #fee2e2;
@@ -174,7 +210,7 @@
       background: #fef3c7;
       color: #b45309;
       font-weight: 700;
-      font-size: 12.5px;
+      font-size: 12px;
       padding: 4px 10px;
       border-radius: 6px;
     }
@@ -192,10 +228,10 @@
       background: #022d7a;
     }
 
-    /* Edit / View Control Panel */
-    #editPanel {
+    /* EDIT PANELS */
+    .edit-panel-wrap {
       display: none;
-      max-width: 740px;
+      max-width: 820px;
       margin: 0 auto;
       width: 100%;
     }
@@ -217,7 +253,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .stat-pill {
       background: #f8fafc;
@@ -228,35 +264,98 @@
     }
     .stat-pill span {
       display: block;
-      font-size: 12.5px;
+      font-size: 12px;
       color: #475569;
       font-weight: 600;
     }
     .stat-pill strong {
       display: block;
-      font-size: 20px;
+      font-size: 19px;
       margin-top: 4px;
       color: #0f172a;
     }
-    .payment-entry-grid {
+
+    .form-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      align-items: end;
-      margin-bottom: 20px;
+      gap: 14px;
+      margin-bottom: 16px;
     }
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* Editable Product Rows inside Commercial Edit */
+    .edit-prod-box {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 18px;
+    }
+    .edit-prod-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .edit-prod-header h4 {
+      margin: 0;
+      font-size: 14px;
+      color: rgb(3, 64, 171);
+    }
+    .btn-mini-add {
+      padding: 6px 12px;
+      background: #eef4ff;
+      color: rgb(3, 64, 171);
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mini-prod-row {
+      display: grid;
+      grid-template-columns: 2fr 0.8fr 0.9fr 0.9fr 34px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .mini-total {
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 7px;
+      padding: 9px 8px;
+      text-align: right;
+      font-weight: 700;
+      color: rgb(3, 64, 171);
+      font-size: 13.5px;
+    }
+    .btn-mini-del {
+      height: 38px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      border-radius: 7px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     .calc-received-box {
       background: #eef4ff;
       border: 1.5px solid #bfdbfe;
       border-radius: 8px;
-      padding: 11px 14px;
-      font-size: 18px;
+      padding: 10px 14px;
+      font-size: 17px;
       font-weight: 800;
       color: rgb(3, 64, 171);
       text-align: right;
     }
 
-    /* Toggle Switch for Print With Stamp / Without Stamp */
+    /* Toggle Switch */
     .stamp-toggle-bar {
       display: flex;
       justify-content: space-between;
@@ -268,7 +367,7 @@
       margin-bottom: 18px;
     }
     .stamp-toggle-bar span {
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 700;
       color: #991b1b;
     }
@@ -339,7 +438,9 @@
     .save-btn:hover { background: #022d7a; }
     .save-btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    /* PAYMENT STATEMENT INVOICE TEMPLATE */
+    /* ==========================================================
+       1. COMMERCIAL STATEMENT PDF TEMPLATE
+       ========================================================== */
     #invoiceSection {
       display: none;
       width: 100%;
@@ -355,7 +456,7 @@
       padding-bottom: 12px;
       margin-bottom: 18px;
     }
-    .stmt-cust-block span {
+    .stmt-cust-block span, .stmt-inv-block span {
       display: block;
       font-size: 12px;
       color: #64748b;
@@ -367,22 +468,12 @@
       color: #0f172a;
       font-weight: 800;
     }
-    .stmt-inv-block {
-      text-align: right;
-    }
-    .stmt-inv-block span {
-      display: block;
-      font-size: 12px;
-      color: #64748b;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
+    .stmt-inv-block { text-align: right; }
     .stmt-inv-block strong {
       font-size: 18px;
       color: rgb(3, 64, 171);
       font-weight: 800;
     }
-
     .stmt-heading {
       font-size: 15px;
       font-weight: 800;
@@ -391,9 +482,9 @@
       letter-spacing: 0.6px;
       margin: 0 0 10px;
     }
-
     .stmt-table-wrapper {
       position: relative;
+      min-height: 150px;
     }
     .stmt-table {
       width: 100%;
@@ -418,7 +509,7 @@
     .col-date { text-align: center; color: #475569 !important; font-weight: 600; }
     .col-amt  { text-align: right; font-weight: 700; }
 
-    /* Center PAID Stamp Overlay */
+    /* Center Rectangular PAID Stamp Overlay */
     .center-paid-stamp {
       display: none;
       position: absolute;
@@ -435,6 +526,7 @@
       text-transform: uppercase;
       pointer-events: none;
       background: rgba(255, 255, 255, 0.72);
+      z-index: 10;
     }
 
     .stmt-balance-box {
@@ -456,7 +548,6 @@
       font-size: 22px;
       color: rgb(3, 64, 171);
     }
-
     .stmt-bottom-note {
       margin-top: 24px;
       text-align: right;
@@ -464,6 +555,72 @@
       font-weight: 600;
       color: #64748b;
       font-style: italic;
+    }
+
+    /* ==========================================================
+       2. PRINTER INVOICE PDF TEMPLATE
+       ========================================================== */
+    #printerInvoiceSection {
+      display: none;
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 20px 28px 28px;
+    }
+    .inv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #cbd5e1;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .inv-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: rgb(3, 64, 171);
+      letter-spacing: 0.5px;
+    }
+    .inv-meta {
+      font-size: 13px;
+      color: #64748b;
+      text-align: right;
+    }
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .inv-table td {
+      padding: 10px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14.5px;
+    }
+    .inv-table td:first-child { color: #475569; font-weight: 600; }
+    .inv-table td:last-child { text-align: right; font-weight: 700; color: #0f172a; }
+    .inv-total-row {
+      background: #eef4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1.5px solid #bfdbfe;
+    }
+    .inv-total-row span {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+    .inv-total-row strong {
+      font-size: 24px;
+      color: rgb(3, 64, 171);
+    }
+    .inv-footer {
+      text-align: center;
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 18px;
     }
 
     /* Preview Action Bar */
@@ -523,8 +680,8 @@
     }
 
     @media (max-width: 760px) {
-      .edit-stats-grid, .payment-entry-grid, .edit-btn-row { grid-template-columns: 1fr; }
-      .filter-bar { flex-direction: column; align-items: stretch; }
+      .edit-stats-grid, .form-grid-2, .form-grid-3, .edit-btn-row { grid-template-columns: 1fr; }
+      .mini-prod-row { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -538,16 +695,21 @@
 
     <div class="top-nav" id="topNav">
       <a href="index.html" class="home-btn">← Home</a>
-      <div class="page-tag">View All & Edit Commercial Invoices</div>
+      <div class="page-tag">View All & Edit Invoices (Printer + Commercial)</div>
     </div>
 
-    <!-- 1. ALL INVOICES LIST SECTION -->
+    <!-- 1. ALL INVOICES UNIFIED LIST SECTION -->
     <div class="content-area" id="listSection">
-      <h2>All Commercial Invoices</h2>
+      <h2>All Invoices (Printer & Commercial)</h2>
 
       <div class="filter-bar">
-        <input type="text" id="searchInput" placeholder="Search by Invoice No (e.g. 180) or Customer Name..." oninput="renderTable()" />
-        <button type="button" class="btn-refresh" onclick="loadInvoices()">↻ Refresh List</button>
+        <div class="type-filter-group">
+          <button type="button" class="filter-pill active" id="filterAll" onclick="setTypeFilter('all')">All</button>
+          <button type="button" class="filter-pill" id="filterPrinter" onclick="setTypeFilter('printer')">Printer</button>
+          <button type="button" class="filter-pill" id="filterComm" onclick="setTypeFilter('commercial')">Commercial</button>
+        </div>
+        <input type="text" id="searchInput" style="flex:1; min-width:220px;" placeholder="Search by Invoice No (e.g. 180) or Customer Name..." oninput="renderTable()" />
+        <button type="button" class="btn-refresh" onclick="loadAllInvoices()">↻ Refresh</button>
       </div>
 
       <div class="table-wrap">
@@ -555,56 +717,77 @@
           <thead>
             <tr>
               <th>Invoice No</th>
+              <th>Type</th>
               <th>Day - Date</th>
               <th>Customer Name</th>
+              <th>Details / Job</th>
               <th>Invoice Total</th>
               <th>Received</th>
-              <th>Balance Status</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody id="invoicesTableBody">
-            <tr><td colspan="7" style="text-align:center; color:#64748b; padding:24px;">Loading invoices from Google Sheet...</td></tr>
+            <tr><td colspan="9" style="text-align:center; color:#64748b; padding:24px;">Loading all invoices from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- 2. EDIT / VIEW INVOICE CONTROL PANEL -->
-    <div class="content-area" id="editPanel">
-      <h2>View / Edit Invoice Payment</h2>
+    <!-- 2A. COMMERCIAL INVOICE EDIT PANEL (Customer, Products, Total & Balance Payment) -->
+    <div class="content-area edit-panel-wrap" id="editCommPanel">
+      <h2>View / Edit Commercial Invoice</h2>
 
       <div class="edit-card">
         <div class="edit-card-header">
           <div>
-            <div style="font-size:12.5px; color:#64748b; font-weight:600;">Customer Name</div>
-            <div id="editCustName" style="font-size:20px; font-weight:800; color:#0f172a;">-</div>
+            <div style="font-size:12px; color:#64748b; font-weight:600;">Editing Invoice</div>
+            <div id="editCommInvNo" style="font-size:19px; font-weight:800; color:rgb(3, 64, 171);">[RRS-180]</div>
           </div>
           <div style="text-align:right;">
-            <div id="editInvNo" style="font-size:17px; font-weight:800; color:rgb(3, 64, 171);">[RRS-180]</div>
-            <div id="editInvDate" style="font-size:13px; color:#64748b;">-</div>
+            <div id="editCommDate" style="font-size:13.5px; font-weight:600; color:#475569;">-</div>
           </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div>
+            <label>Name of the Customer</label>
+            <input type="text" id="editCommCustName" placeholder="Customer Name" />
+          </div>
+          <div>
+            <label>Invoice Total Amount (₹)</label>
+            <input type="number" id="editCommTotalInput" min="0" step="0.01" oninput="recalcCommercialEdit()" />
+          </div>
+        </div>
+
+        <!-- Editable Products List -->
+        <div class="edit-prod-box">
+          <div class="edit-prod-header">
+            <h4>Products List (Edit or Add Items)</h4>
+            <button type="button" class="btn-mini-add" onclick="addMiniProductRow()">+ Add Product</button>
+          </div>
+          <div id="editCommProdList"></div>
         </div>
 
         <div class="edit-stats-grid">
           <div class="stat-pill">
-            <span>Invoice Total Amount</span>
-            <strong id="editTotalAmt">₹0</strong>
+            <span>Invoice Total</span>
+            <strong id="editCommTotalDisp">₹0</strong>
           </div>
           <div class="stat-pill">
-            <span>Advance Received</span>
-            <strong id="editAdvAmt" style="color:#059669;">₹0</strong>
+            <span>Already Received</span>
+            <strong id="editCommPrevRecDisp" style="color:#059669;">₹0</strong>
           </div>
           <div class="stat-pill">
             <span>Balance to Collect</span>
-            <strong id="editCurrBalance" style="color:#dc2626;">₹0</strong>
+            <strong id="editCommBalDisp" style="color:#dc2626;">₹0</strong>
           </div>
         </div>
 
-        <div class="payment-entry-grid" id="paymentInputGrid">
+        <div class="form-grid-2" id="commPaymentGrid">
           <div>
-            <label>Amount Received Now from Customer (₹)</label>
-            <input type="number" id="newPaymentInput" min="0" step="0.01" placeholder="Enter amount received" oninput="calculateTotalReceived()" />
+            <label>New Amount Received from Customer (₹)</label>
+            <input type="number" id="newPaymentInput" min="0" step="0.01" placeholder="0" oninput="recalcCommercialEdit()" />
           </div>
           <div>
             <label>Total Received After Update</label>
@@ -623,14 +806,96 @@
 
         <div class="edit-btn-row">
           <button type="button" class="btn-back-list" onclick="backToList()">← Back</button>
-          <button type="button" class="btn-view-only" onclick="previewCurrentInvoice()">Download Invoice</button>
-          <button type="button" class="save-btn" id="btnSavePayment" onclick="savePaymentUpdate()">Save & Download Invoice</button>
+          <button type="button" class="btn-view-only" onclick="previewCommercialStatement(0)">Download Statement</button>
+          <button type="button" class="save-btn" id="btnSaveComm" onclick="saveCommercialEdit()">Save & Download</button>
         </div>
-        <div id="editStatus" style="margin-top:10px; text-align:center; font-size:13.5px; font-weight:600;"></div>
+        <div id="editCommStatus" style="margin-top:10px; text-align:center; font-size:13.5px; font-weight:600;"></div>
       </div>
     </div>
 
-    <!-- 3. PAYMENT STATEMENT INVOICE TEMPLATE -->
+    <!-- 2B. PRINTER INVOICE EDIT PANEL (Customer, Job/Product, Specs & Amount) -->
+    <div class="content-area edit-panel-wrap" id="editPrinterPanel">
+      <h2>View / Edit Printer Invoice</h2>
+
+      <div class="edit-card">
+        <div class="edit-card-header">
+          <div>
+            <div style="font-size:12px; color:#64748b; font-weight:600;">Printer Invoice</div>
+            <div id="editPrtInvNo" style="font-size:19px; font-weight:800; color:rgb(3, 64, 171);">[RRS-175]</div>
+          </div>
+          <div style="text-align:right;">
+            <div id="editPrtDate" style="font-size:13.5px; font-weight:600; color:#475569;">-</div>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div>
+            <label>Customer Name</label>
+            <input type="text" id="editPrtCustName" />
+          </div>
+          <div>
+            <label>Job / Product Name</label>
+            <input type="text" id="editPrtJobName" />
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div>
+            <label>Pages</label>
+            <input type="number" id="editPrtPages" min="0" />
+          </div>
+          <div>
+            <label>Paper QTY</label>
+            <input type="number" id="editPrtPaperQty" min="0" />
+          </div>
+          <div>
+            <label>Spiral Qty</label>
+            <input type="number" id="editPrtSpiralQty" min="0" />
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div>
+            <label>Color</label>
+            <select id="editPrtColor">
+              <option value="Black & White">Black & White</option>
+              <option value="Color">Color</option>
+            </select>
+          </div>
+          <div>
+            <label>Side</label>
+            <select id="editPrtSide">
+              <option value="Single Side">Single Side</option>
+              <option value="Front & Back">Front & Back</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div>
+            <label>Print Amount (₹)</label>
+            <input type="number" id="editPrtPrintAmt" min="0" step="0.01" oninput="recalcPrinterTotal()" />
+          </div>
+          <div>
+            <label>Spiral Amount (₹)</label>
+            <input type="number" id="editPrtSpiralAmt" min="0" step="0.01" oninput="recalcPrinterTotal()" />
+          </div>
+          <div>
+            <label>Grand Total (₹)</label>
+            <input type="number" id="editPrtGrandTotal" min="0" step="0.01" style="font-weight:800; color:rgb(3, 64, 171);" />
+          </div>
+        </div>
+
+        <div class="edit-btn-row">
+          <button type="button" class="btn-back-list" onclick="backToList()">← Back</button>
+          <button type="button" class="btn-view-only" onclick="previewPrinterInvoice()">Download Invoice</button>
+          <button type="button" class="save-btn" id="btnSavePrt" onclick="savePrinterEdit()">Save & Download</button>
+        </div>
+        <div id="editPrtStatus" style="margin-top:10px; text-align:center; font-size:13.5px; font-weight:600;"></div>
+      </div>
+    </div>
+
+    <!-- 3A. COMMERCIAL PAYMENT STATEMENT PDF TEMPLATE -->
     <div id="invoiceSection">
       <div class="stmt-top-row">
         <div class="stmt-cust-block">
@@ -657,6 +922,7 @@
           <tbody id="stmtBody"></tbody>
         </table>
 
+        <!-- Center PAID Stamp -->
         <div class="center-paid-stamp" id="centerPaidStamp">PAID</div>
       </div>
 
@@ -666,6 +932,34 @@
       </div>
 
       <div class="stmt-bottom-note">Computer Generated Invoice</div>
+    </div>
+
+    <!-- 3B. PRINTER INVOICE PDF TEMPLATE -->
+    <div id="printerInvoiceSection">
+      <div class="inv-header">
+        <div class="inv-title">INVOICE</div>
+        <div class="inv-meta">
+          <div id="pInvNo" style="font-weight: 700; color: #0f172a; font-size: 14px;">[RRS-175]</div>
+          <div id="pInvDate"></div>
+        </div>
+      </div>
+
+      <table class="inv-table">
+        <tr><td>Name of the Customer</td><td id="pInvCustomer">-</td></tr>
+        <tr><td>Job Name</td><td id="pInvJob">-</td></tr>
+        <tr><td>No. of Pages</td><td id="pInvPages">-</td></tr>
+        <tr><td>Paper Quantity (Sheets)</td><td id="pInvPaperQty">-</td></tr>
+        <tr><td>Print Type & Side</td><td id="pInvType">-</td></tr>
+        <tr><td>Print Amount</td><td id="pInvPrintAmt">₹0</td></tr>
+        <tr><td>Spiral Binding (<span id="pInvSpiralQty">0</span> Nos)</td><td id="pInvSpiralAmt">₹0</td></tr>
+      </table>
+
+      <div class="inv-total-row">
+        <span>Total Amount</span>
+        <strong id="pInvGrandTotal">₹0</strong>
+      </div>
+
+      <div class="inv-footer">Thank you for choosing RRS FlexoraHub!</div>
     </div>
   </div>
 
@@ -690,21 +984,38 @@
   const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz4j7HZ71_STCQsKmZZWhnrVFhkENWNeHzfmM7Q4DbPAyPKYCogeENa7wvl6H8z8BNu/exec";
 
   let allInvoices = [];
+  let currentTypeFilter = "all";
   let selectedInv = null;
   let currentPdfFilename = "Invoice.pdf";
   let printWithStamp = true;
 
-  // Strips "00:00:00 GMT+0530 (India Standard Time)" and returns clean "Mon - 23 Nov 2026"
   function formatCleanDayDate(rawVal) {
     if (!rawVal) return "-";
     const str = String(rawVal).trim();
+    const m = str.match(/^([A-Za-z]{3}),?\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/);
+    if (m) return `${m[1]} - ${m[3].padStart(2, "0")} ${m[2]} ${m[4]}`;
+    const m2 = str.match(/^([A-Za-z]{3}),?\s+(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/);
+    if (m2) return `${m2[1]} - ${m2[2].padStart(2, "0")} ${m2[3]} ${m2[4]}`;
     const parsed = new Date(str);
     if (!isNaN(parsed.getTime())) {
       const weekday = parsed.toLocaleDateString("en-GB", { weekday: "short" });
       const datePart = parsed.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
       return `${weekday} - ${datePart}`;
     }
-    return str.replace(/\s*\d{2}:\d{2}:\d{2}.*$/, "").replace(",", " -");
+    return str.replace(/\s*\d{2}:\d{2}:\d{2}.*$/, "");
+  }
+
+  function extractSeriesNum(invNo) {
+    const m = String(invNo).match(/RRS-(\d+)/i);
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  function setTypeFilter(type) {
+    currentTypeFilter = type;
+    document.getElementById("filterAll").classList.toggle("active", type === "all");
+    document.getElementById("filterPrinter").classList.toggle("active", type === "printer");
+    document.getElementById("filterComm").classList.toggle("active", type === "commercial");
+    renderTable();
   }
 
   function syncStampToggle(isChecked) {
@@ -724,19 +1035,21 @@
     }
   }
 
-  async function loadInvoices() {
+  async function loadAllInvoices() {
     const tbody = document.getElementById("invoicesTableBody");
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:24px;">Loading invoices...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#64748b; padding:24px;">Loading all invoices...</td></tr>`;
 
     try {
       const res = await fetch(WEBAPP_URL);
       const data = await res.json();
       if (data.status === "success") {
-        allInvoices = (data.commercialInvoices || []).reverse();
+        const prt = data.printerInvoices || [];
+        const comm = data.commercialInvoices || [];
+        allInvoices = [...prt, ...comm].sort((a, b) => extractSeriesNum(b.invoiceNo) - extractSeriesNum(a.invoiceNo));
         renderTable();
       }
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red; padding:24px;">Error: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:red; padding:24px;">Error: ${err.message}</td></tr>`;
     }
   }
 
@@ -744,19 +1057,37 @@
     const tbody = document.getElementById("invoicesTableBody");
     const q = document.getElementById("searchInput").value.trim().toLowerCase();
 
-    const filtered = allInvoices.filter(inv =>
-      inv.invoiceNo.toLowerCase().includes(q) || inv.customerName.toLowerCase().includes(q)
-    );
+    const filtered = allInvoices.filter(inv => {
+      const matchType = currentTypeFilter === "all" || inv.type === currentTypeFilter;
+      const matchSearch = inv.invoiceNo.toLowerCase().includes(q) || inv.customerName.toLowerCase().includes(q);
+      return matchType && matchSearch;
+    });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:24px;">No commercial invoices found.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#64748b; padding:24px;">No invoices found.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = "";
     filtered.forEach(inv => {
-      const isPaid = inv.balanceAmount <= 0;
       const cleanDate = formatCleanDayDate(inv.invoiceDate);
+      const typeBadge = inv.type === "printer"
+        ? `<span class="type-badge-printer">Printer</span>`
+        : `<span class="type-badge-comm">Commercial</span>`;
+
+      let detailsSummary = "-";
+      if (inv.type === "printer") {
+        detailsSummary = inv.jobName || "Print Job";
+      } else {
+        try {
+          const items = JSON.parse(inv.itemsJson || "[]");
+          detailsSummary = items.length > 0 ? items.map(x => x.name).join(", ") : "Commercial Products";
+        } catch (e) {
+          detailsSummary = "Commercial Products";
+        }
+      }
+
+      const isPaid = inv.balanceAmount <= 0;
       const statusBadge = isPaid
         ? `<span class="badge-paid">PAID (₹0)</span>`
         : `<span class="badge-bal">Bal: ₹${inv.balanceAmount}</span>`;
@@ -764,8 +1095,10 @@
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td style="font-weight:700; color:rgb(3, 64, 171);">${inv.invoiceNo}</td>
+        <td>${typeBadge}</td>
         <td>${cleanDate}</td>
         <td style="font-weight:600;">${inv.customerName}</td>
+        <td style="color:#475569; max-width:200px;">${detailsSummary}</td>
         <td style="font-weight:700;">₹${inv.totalAmount}</td>
         <td style="color:#059669; font-weight:700;">₹${inv.receivedAmount}</td>
         <td>${statusBadge}</td>
@@ -779,49 +1112,122 @@
     selectedInv = allInvoices.find(inv => inv.invoiceNo === invNo);
     if (!selectedInv) return;
 
-    const cleanDate = formatCleanDayDate(selectedInv.invoiceDate);
-    document.getElementById("editCustName").innerText = selectedInv.customerName;
-    document.getElementById("editInvNo").innerText = selectedInv.invoiceNo;
-    document.getElementById("editInvDate").innerText = cleanDate;
-    document.getElementById("editTotalAmt").innerText = "₹" + selectedInv.totalAmount;
-    document.getElementById("editAdvAmt").innerText = "₹" + selectedInv.advanceAmount;
-    document.getElementById("editCurrBalance").innerText = "₹" + selectedInv.balanceAmount;
-
-    document.getElementById("newPaymentInput").value = "";
-    document.getElementById("editTotalReceivedDisp").innerText = "₹" + selectedInv.receivedAmount;
-    document.getElementById("editStatus").innerText = "";
-
-    const isAlreadyPaid = selectedInv.balanceAmount <= 0;
-    document.getElementById("paymentInputGrid").style.display = isAlreadyPaid ? "none" : "grid";
-    document.getElementById("btnSavePayment").style.display = isAlreadyPaid ? "none" : "block";
-    document.getElementById("editStampToggleBox").style.display = isAlreadyPaid ? "flex" : "none";
-
     document.getElementById("listSection").style.display = "none";
     document.getElementById("invoiceSection").style.display = "none";
+    document.getElementById("printerInvoiceSection").style.display = "none";
     document.getElementById("invActions").style.display = "none";
-    document.getElementById("editPanel").style.display = "flex";
+
+    if (selectedInv.type === "printer") {
+      // Open Printer Invoice Editor
+      document.getElementById("editPrtInvNo").innerText = selectedInv.invoiceNo;
+      document.getElementById("editPrtDate").innerText = formatCleanDayDate(selectedInv.invoiceDate);
+      document.getElementById("editPrtCustName").value = selectedInv.customerName;
+      document.getElementById("editPrtJobName").value = selectedInv.jobName;
+      document.getElementById("editPrtPages").value = selectedInv.pages;
+      document.getElementById("editPrtPaperQty").value = selectedInv.paperQty;
+      document.getElementById("editPrtSpiralQty").value = selectedInv.spiralQty;
+      document.getElementById("editPrtColor").value = selectedInv.color || "Black & White";
+      document.getElementById("editPrtSide").value = selectedInv.side || "Single Side";
+      document.getElementById("editPrtPrintAmt").value = selectedInv.printAmount;
+      document.getElementById("editPrtSpiralAmt").value = selectedInv.spiralAmount;
+      document.getElementById("editPrtGrandTotal").value = selectedInv.totalAmount;
+      document.getElementById("editPrtStatus").innerText = "";
+
+      document.getElementById("editCommPanel").style.display = "none";
+      document.getElementById("editPrinterPanel").style.display = "flex";
+    } else {
+      // Open Commercial Invoice Editor (Customer, Products, Total & Payment)
+      document.getElementById("editCommInvNo").innerText = selectedInv.invoiceNo;
+      document.getElementById("editCommDate").innerText = formatCleanDayDate(selectedInv.invoiceDate);
+      document.getElementById("editCommCustName").value = selectedInv.customerName;
+      document.getElementById("editCommTotalInput").value = selectedInv.totalAmount;
+      document.getElementById("newPaymentInput").value = "";
+      document.getElementById("editCommStatus").innerText = "";
+
+      const prodContainer = document.getElementById("editCommProdList");
+      prodContainer.innerHTML = "";
+      let parsedItems = [];
+      try {
+        parsedItems = JSON.parse(selectedInv.itemsJson || "[]");
+      } catch (e) {}
+
+      if (parsedItems.length > 0) {
+        parsedItems.forEach(item => addMiniProductRow(item.name, item.qty, item.price));
+      }
+
+      recalcCommercialEdit();
+      document.getElementById("editPrinterPanel").style.display = "none";
+      document.getElementById("editCommPanel").style.display = "flex";
+    }
   }
 
-  function calculateTotalReceived() {
+  // Commercial Mini Product Rows
+  function addMiniProductRow(name = "", qty = 1, price = 0) {
+    const container = document.getElementById("editCommProdList");
+    const row = document.createElement("div");
+    row.className = "mini-prod-row";
+    row.innerHTML = `
+      <input type="text" class="m-name" placeholder="Product Name" value="${name}" />
+      <input type="number" class="m-qty" min="1" value="${qty}" oninput="recalcMiniProducts()" />
+      <input type="number" class="m-price" min="0" step="0.01" value="${price}" oninput="recalcMiniProducts()" />
+      <div class="mini-total">₹${+(qty * price).toFixed(2)}</div>
+      <button type="button" class="btn-mini-del" onclick="this.parentElement.remove(); recalcMiniProducts();">×</button>
+    `;
+    container.appendChild(row);
+    recalcMiniProducts();
+  }
+
+  function recalcMiniProducts() {
+    const rows = document.querySelectorAll(".mini-prod-row");
+    if (rows.length === 0) return;
+    let sum = 0;
+    rows.forEach(r => {
+      const q = parseFloat(r.querySelector(".m-qty").value) || 0;
+      const p = parseFloat(r.querySelector(".m-price").value) || 0;
+      const t = +(q * p).toFixed(2);
+      r.querySelector(".mini-total").innerText = "₹" + t;
+      sum = +(sum + t).toFixed(2);
+    });
+    document.getElementById("editCommTotalInput").value = sum;
+    recalcCommercialEdit();
+  }
+
+  function recalcCommercialEdit() {
     if (!selectedInv) return;
+    const totalAmt = parseFloat(document.getElementById("editCommTotalInput").value) || 0;
+    const prevRec = selectedInv.receivedAmount;
     const addPay = parseFloat(document.getElementById("newPaymentInput").value) || 0;
-    const totalRec = +(selectedInv.receivedAmount + addPay).toFixed(2);
-    document.getElementById("editTotalReceivedDisp").innerText = "₹" + totalRec;
+    const newTotalRec = +(prevRec + addPay).toFixed(2);
+    const bal = Math.max(0, +(totalAmt - newTotalRec).toFixed(2));
+
+    document.getElementById("editCommTotalDisp").innerText = "₹" + totalAmt;
+    document.getElementById("editCommPrevRecDisp").innerText = "₹" + prevRec;
+    document.getElementById("editCommBalDisp").innerText = "₹" + bal;
+    document.getElementById("editTotalReceivedDisp").innerText = "₹" + newTotalRec;
+
+    document.getElementById("editStampToggleBox").style.display = bal <= 0 ? "flex" : "none";
+  }
+
+  function recalcPrinterTotal() {
+    const p = parseFloat(document.getElementById("editPrtPrintAmt").value) || 0;
+    const s = parseFloat(document.getElementById("editPrtSpiralAmt").value) || 0;
+    document.getElementById("editPrtGrandTotal").value = +(p + s).toFixed(2);
   }
 
   function backToList() {
-    document.getElementById("editPanel").style.display = "none";
+    document.getElementById("editCommPanel").style.display = "none";
+    document.getElementById("editPrinterPanel").style.display = "none";
     document.getElementById("invoiceSection").style.display = "none";
+    document.getElementById("printerInvoiceSection").style.display = "none";
     document.getElementById("invActions").style.display = "none";
     document.getElementById("listSection").style.display = "flex";
-    loadInvoices();
+    loadAllInvoices();
   }
 
   function parseHistoryEntries(rawHistory) {
     const entries = [];
     if (!rawHistory) return entries;
-    const parts = rawHistory.split(";;");
-    parts.forEach(p => {
+    rawHistory.split(";;").forEach(p => {
       const seg = p.split("|");
       if (seg.length === 2) {
         entries.push({ date: formatCleanDayDate(seg[0].trim()), amount: Number(seg[1]) || 0 });
@@ -830,42 +1236,42 @@
     return entries;
   }
 
-  function renderStatementInvoice(invObj, extraPaymentObj) {
-    const cleanInv = invObj.invoiceNo.replace(/[\[\]]/g, "");
-    const safeCustomer = invObj.customerName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
-    const cleanInvDate = formatCleanDayDate(invObj.invoiceDate);
+  function previewCommercialStatement(extraPayAmount) {
+    if (!selectedInv) return;
+    const custName = document.getElementById("editCommCustName").value.trim() || selectedInv.customerName;
+    const updatedTotal = parseFloat(document.getElementById("editCommTotalInput").value) || 0;
+    const cleanInv = selectedInv.invoiceNo.replace(/[\[\]]/g, "");
+    const safeCustomer = custName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
+    const cleanInvDate = formatCleanDayDate(selectedInv.invoiceDate);
     currentPdfFilename = safeCustomer + "_" + cleanInv + "_Statement.pdf";
 
-    document.getElementById("stmtCustName").innerText = invObj.customerName;
-    document.getElementById("stmtInvNo").innerText = invObj.invoiceNo;
+    document.getElementById("stmtCustName").innerText = custName;
+    document.getElementById("stmtInvNo").innerText = selectedInv.invoiceNo;
 
     const tbody = document.getElementById("stmtBody");
     tbody.innerHTML = "";
 
-    // Row 1: Invoice Amount
     const trInv = document.createElement("tr");
     trInv.innerHTML = `
-      <td class="col-desc">Invoice Amount (${invObj.invoiceNo})</td>
+      <td class="col-desc">Invoice Amount (${selectedInv.invoiceNo})</td>
       <td class="col-date">${cleanInvDate}</td>
-      <td class="col-amt">₹${invObj.totalAmount}</td>
+      <td class="col-amt">₹${updatedTotal}</td>
     `;
     tbody.appendChild(trInv);
 
-    // Row 2: Advance (Only if Advance > 0)
-    if (invObj.advanceAmount > 0) {
+    if (selectedInv.advanceAmount > 0) {
       const trAdv = document.createElement("tr");
       trAdv.innerHTML = `
         <td class="col-desc">Advance</td>
         <td class="col-date">${cleanInvDate}</td>
-        <td class="col-amt" style="color:#059669;">₹${invObj.advanceAmount}</td>
+        <td class="col-amt" style="color:#059669;">₹${selectedInv.advanceAmount}</td>
       `;
       tbody.appendChild(trAdv);
     }
 
-    // Subsequent Rows: Amount 1, Amount 2, Amount 3...
-    const historyList = parseHistoryEntries(invObj.historyRaw);
-    if (extraPaymentObj && extraPaymentObj.amount > 0) {
-      historyList.push({ date: formatCleanDayDate(extraPaymentObj.date), amount: extraPaymentObj.amount });
+    const historyList = parseHistoryEntries(selectedInv.historyRaw);
+    if (extraPayAmount > 0) {
+      historyList.push({ date: formatCleanDayDate(new Date()), amount: extraPayAmount });
     }
 
     let instSum = 0;
@@ -880,9 +1286,8 @@
       tbody.appendChild(trPay);
     });
 
-    const totalReceived = +(invObj.advanceAmount + instSum).toFixed(2);
-    const finalBalance = Math.max(0, +(invObj.totalAmount - totalReceived).toFixed(2));
-
+    const totalReceived = +(selectedInv.advanceAmount + instSum).toFixed(2);
+    const finalBalance = Math.max(0, +(updatedTotal - totalReceived).toFixed(2));
     document.getElementById("stmtBalanceAmt").innerText = "₹" + finalBalance;
 
     const isZeroBalance = finalBalance <= 0;
@@ -892,17 +1297,157 @@
     document.getElementById("previewStampToggleBox").style.display = isZeroBalance ? "flex" : "none";
     stampEl.style.display = (isZeroBalance && printWithStamp) ? "block" : "none";
 
-    document.getElementById("editPanel").style.display = "none";
+    document.getElementById("editCommPanel").style.display = "none";
+    document.getElementById("printerInvoiceSection").style.display = "none";
     document.getElementById("invoiceSection").style.display = "block";
     document.getElementById("invActions").style.display = "flex";
+
+    setTimeout(() => downloadPDF(), 350);
   }
 
-  function previewCurrentInvoice() {
+  async function saveCommercialEdit() {
     if (!selectedInv) return;
-    renderStatementInvoice(selectedInv, null);
-    setTimeout(() => {
-      downloadPDF();
-    }, 350);
+    const custName = document.getElementById("editCommCustName").value.trim();
+    const updatedTotal = parseFloat(document.getElementById("editCommTotalInput").value) || 0;
+    const newPay = parseFloat(document.getElementById("newPaymentInput").value) || 0;
+    const statusEl = document.getElementById("editCommStatus");
+    const btn = document.getElementById("btnSaveComm");
+
+    if (!custName) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Customer Name enter pannunga!";
+      return;
+    }
+
+    const currentBal = Math.max(0, +(updatedTotal - selectedInv.receivedAmount).toFixed(2));
+    if (newPay < 0 || newPay > currentBal) {
+      statusEl.style.color = "red";
+      statusEl.innerText = `Balance ₹${currentBal}-vida adhigama poda mudiyaadhu!`;
+      return;
+    }
+
+    const miniRows = document.querySelectorAll(".mini-prod-row");
+    const updatedItems = [];
+    miniRows.forEach(r => {
+      const n = r.querySelector(".m-name").value.trim();
+      const q = parseFloat(r.querySelector(".m-qty").value) || 0;
+      const p = parseFloat(r.querySelector(".m-price").value) || 0;
+      if (n && q > 0) updatedItems.push({ name: n, qty: q, price: p, total: +(q * p).toFixed(2) });
+    });
+
+    btn.disabled = true;
+    btn.innerText = "Saving & Downloading...";
+    statusEl.innerText = "";
+
+    try {
+      await fetch(WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "update_commercial_full",
+          invoiceNo: selectedInv.invoiceNo,
+          customerName: custName,
+          totalAmount: updatedTotal,
+          newPayment: newPay,
+          items: updatedItems.length > 0 ? updatedItems : null
+        })
+      });
+
+      previewCommercialStatement(newPay);
+    } catch (err) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Error: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Save & Download";
+    }
+  }
+
+  function previewPrinterInvoice() {
+    if (!selectedInv) return;
+    const custName = document.getElementById("editPrtCustName").value.trim() || selectedInv.customerName;
+    const jobName = document.getElementById("editPrtJobName").value.trim() || selectedInv.jobName;
+    const pages = document.getElementById("editPrtPages").value || 0;
+    const paperQty = document.getElementById("editPrtPaperQty").value || 0;
+    const spiralQty = document.getElementById("editPrtSpiralQty").value || 0;
+    const color = document.getElementById("editPrtColor").value;
+    const side = document.getElementById("editPrtSide").value;
+    const printAmt = document.getElementById("editPrtPrintAmt").value || 0;
+    const spiralAmt = document.getElementById("editPrtSpiralAmt").value || 0;
+    const grandTotal = document.getElementById("editPrtGrandTotal").value || 0;
+
+    const cleanInv = selectedInv.invoiceNo.replace(/[\[\]]/g, "");
+    const safeCustomer = custName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
+    currentPdfFilename = safeCustomer + "_" + cleanInv + ".pdf";
+
+    document.getElementById("pInvNo").innerText = selectedInv.invoiceNo;
+    document.getElementById("pInvDate").innerText = formatCleanDayDate(selectedInv.invoiceDate);
+    document.getElementById("pInvCustomer").innerText = custName;
+    document.getElementById("pInvJob").innerText = jobName;
+    document.getElementById("pInvPages").innerText = pages;
+    document.getElementById("pInvPaperQty").innerText = paperQty;
+    document.getElementById("pInvType").innerText = color + " (" + side + ")";
+    document.getElementById("pInvPrintAmt").innerText = "₹" + printAmt;
+    document.getElementById("pInvSpiralQty").innerText = spiralQty;
+    document.getElementById("pInvSpiralAmt").innerText = "₹" + spiralAmt;
+    document.getElementById("pInvGrandTotal").innerText = "₹" + grandTotal;
+
+    document.getElementById("previewStampToggleBox").style.display = "none";
+    document.getElementById("editPrinterPanel").style.display = "none";
+    document.getElementById("invoiceSection").style.display = "none";
+    document.getElementById("printerInvoiceSection").style.display = "block";
+    document.getElementById("invActions").style.display = "flex";
+
+    setTimeout(() => downloadPDF(), 350);
+  }
+
+  async function savePrinterEdit() {
+    if (!selectedInv) return;
+    const custName = document.getElementById("editPrtCustName").value.trim();
+    const jobName = document.getElementById("editPrtJobName").value.trim();
+    const statusEl = document.getElementById("editPrtStatus");
+    const btn = document.getElementById("btnSavePrt");
+
+    if (!custName || !jobName) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Customer Name & Job Name enter pannunga!";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Saving & Downloading...";
+    statusEl.innerText = "";
+
+    try {
+      await fetch(WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "edit_printer_invoice",
+          invoiceNo: selectedInv.invoiceNo,
+          customerName: custName,
+          jobName: jobName,
+          pages: document.getElementById("editPrtPages").value,
+          paperQty: document.getElementById("editPrtPaperQty").value,
+          color: document.getElementById("editPrtColor").value,
+          side: document.getElementById("editPrtSide").value,
+          spiralQty: document.getElementById("editPrtSpiralQty").value,
+          printAmount: document.getElementById("editPrtPrintAmt").value,
+          spiralAmount: document.getElementById("editPrtSpiralAmt").value,
+          grandTotal: document.getElementById("editPrtGrandTotal").value
+        })
+      });
+
+      previewPrinterInvoice();
+    } catch (err) {
+      statusEl.style.color = "red";
+      statusEl.innerText = "Error: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Save & Download";
+    }
   }
 
   function downloadPDF() {
@@ -927,56 +1472,7 @@
     });
   }
 
-  async function savePaymentUpdate() {
-    if (!selectedInv) return;
-    const newPay = parseFloat(document.getElementById("newPaymentInput").value) || 0;
-    const statusEl = document.getElementById("editStatus");
-    const btn = document.getElementById("btnSavePayment");
-
-    if (newPay <= 0) {
-      statusEl.style.color = "red";
-      statusEl.innerText = "Customer kodutha amount-a enter pannunga!";
-      return;
-    }
-    if (newPay > selectedInv.balanceAmount) {
-      statusEl.style.color = "red";
-      statusEl.innerText = `Balance ₹${selectedInv.balanceAmount}-vida adhigama poda mudiyaadhu!`;
-      return;
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Saving & Downloading...";
-    statusEl.innerText = "";
-
-    try {
-      await fetch(WEBAPP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "update_commercial_payment",
-          invoiceNo: selectedInv.invoiceNo,
-          newPayment: newPay
-        })
-      });
-
-      const cleanToday = formatCleanDayDate(new Date());
-      renderStatementInvoice(selectedInv, { date: cleanToday, amount: newPay });
-
-      setTimeout(() => {
-        downloadPDF();
-      }, 350);
-
-    } catch (err) {
-      statusEl.style.color = "red";
-      statusEl.innerText = "Error: " + err.message;
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "Save & Download Invoice";
-    }
-  }
-
-  loadInvoices();
+  loadAllInvoices();
 </script>
 
 </body>
